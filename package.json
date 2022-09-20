@@ -9,15 +9,37 @@
     "start": "npm run dev",
     "dev": "vite",
     "build": "tsc && vite build",
-    "serve": "tsc && vite preview"
+    "serve": "tsc && vite preview",
+    "scss": "sass assets/scss assets/css",
+    "scss-watch": "sass --watch assets/scss -o assets/css",
+    "doTest": "console.log(node.declaration.name)"
   },
   "dependencies": {
-    "lit": "*",
-    "monaco-editor": "^0.26.1"
+    "@spectrum-web-components/split-view": "^0.5.0",
+    "express": "^4.18.1",
+    "install": "^0.13.0",
+    "js-yaml": "^4.1.0",
+    "lit": "^2.2.8",
+    "monaco-editor": "^0.33.0",
+    "monaco-yaml": "^4.0.0",
+    "npm": "^8.17.0",
+    "sass-loader": "^13.0.2",
+    "tslib": "^2.4.0",
+    "vm2": "^3.9.10",
+    "yaml": "^2.1.1"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@types/js-yaml": "^4.0.5",
     "@types/node": "^16.4.7",
-    "typescript": "^4.3.5",
+    "@web/dev-server": "^0.1.32",
+    "postcss": "^8.4.14",
+    "rollup": "^2.75.7",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-postcss-lit": "^2.0.0",
+    "rollup-plugin-typescript2": "^0.32.1",
+    "sass": "^1.54.3",
+    "typescript": "^4.7.4",
     "vite": "^2.4.4"
   }
 }

@@ -1,15 +1,17 @@
-import { css, html, LitElement } from "lit";
+import {css, html, LitElement, PropertyValues} from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { createRef, Ref, ref } from "lit/directives/ref.js";
 
 // -- Monaco Editor Imports --
 import * as monaco from "monaco-editor";
 import styles from "monaco-editor/min/vs/editor/editor.main.css";
-import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
 import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
+import YamlWorker from 'monaco-yaml/yaml.worker?worker';
+import {observer} from "./@material/web/compat/base/observer";
+// import { setDiagnosticsOptions } from 'monaco-yaml';
 
 // @ts-ignore
 self.MonacoEnvironment = {
@@ -26,8 +28,14 @@ self.MonacoEnvironment = {
     if (label === "typescript" || label === "javascript") {
       return new tsWorker();
     }
-    return new editorWorker();
-  },
+    if (label === 'yaml') {
+
+      //return new Worker(new URL('monaco-yaml/yaml.worker', import.meta.url));
+      return new YamlWorker();
+    } else {
+      return null;
+    }
+  }
 };
 
 @customElement("code-editor")
@@ -37,7 +45,12 @@ export class CodeEditor extends LitElement {
   @property({ type: Boolean, attribute: "readonly" }) readOnly?: boolean;
   @property() theme?: string;
   @property() language?: string;
-  @property() code?: string;
+
+  @property()
+  @observer(function(this: CodeEditor) {
+    this.setValue(this.code || '---');
+  })
+  code?: string;
 
   static styles = css`
     :host {
@@ -49,6 +62,17 @@ export class CodeEditor extends LitElement {
       height: var(--editor-height);
     }
   `;
+
+  updated(changedProperties:PropertyValues) {
+    if (changedProperties.has('code')) {
+      // if(this.editor){
+      //   this.setValue(changedProperties.get('code'));
+      //   // const now = Date.now();
+      //   // console.log(now);
+      //   // this.setValue('---' + now);
+      // }
+    }
+  }
 
   render() {
     return html`
@@ -93,7 +117,7 @@ export class CodeEditor extends LitElement {
   }
 
   setValue(value: string) {
-    this.editor!.setValue(value);
+    this.editor!.setValue(value || '---');
   }
 
   getValue() {
@@ -119,7 +143,7 @@ export class CodeEditor extends LitElement {
       readOnly: this.readOnly ?? false,
     });
     this.editor.getModel()!.onDidChangeContent(() => {
-      this.dispatchEvent(new CustomEvent("change", { detail: {} }));
+      this.dispatchEvent(new CustomEvent("change", {bubbles: true, composed:true, detail: { value: this.getValue()} }));
     });
     window
       .matchMedia("(prefers-color-scheme: dark)")

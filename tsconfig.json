@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "esnext",
+    "module": "es2015",
     "lib": ["es2017", "dom", "dom.iterable"],
     "declaration": true,
     "emitDeclarationOnly": true,
@@ -14,8 +14,12 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "importHelpers": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts"
+  ],
   "exclude": []
 }

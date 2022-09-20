@@ -1,9 +1,5 @@
-# Lit Code Editor
+#API Reg Next
 
-[![Demo](https://github.com/rodydavis/lit-code-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/rodydavis/lit-code-editor/actions/workflows/ci.yml)
 
-Simple example of Lit + Vite + Monaco Editor as a web component that can be embedded in pages.
-
-Online demo: https://rodydavis.github.io/lit-code-editor/
-
-Another version to look at: https://github.com/vanillawc/wc-monaco-editor
+* Form will be rendered based on definitions stored in APIRegConfiguration
+*

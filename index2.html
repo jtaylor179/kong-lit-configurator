@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/src/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lit Code Editor</title>
+    <script type="module" src="/src/config-form.ts"></script>
+    <script type="module" src="/src/code-editor.ts"></script>
+    <script type="module" src="/src/reg-form.ts"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100vh;
+      }
+      .main-layout {
+        display: flex;
+      }
+    </style>
+
+  </head>
+  <body>
+    <div class="main-layout">
+      <config-form id="configForm" style="flex:1"  ></config-form>
+      <reg-form id="regForm" style="width:600px;"></reg-form>
+      <code-editor  style="flex:1" language="yaml">
+<pre>
+---
+openapi: "3.0.0"
+x-kong-name: Petstore API
+info:
+  version: 1.0.0
+  title: Swagger Petstore
+servers:
+  - url: http://petstore.swagger.io/v1
+paths:
+  /pets:
+    get:
+      summary: Get all pets
+      x-kong-plugin-key-auth:
+        name: key-auth
+        enabled: true
+      x-kong-plugin-request-transformer:
+        name: config.add.headers
+
+</pre>
+      </code-editor>
+    </div>
+
+  </body>
+  <script defer>
+    document.getElementById('configForm').addEventListener('change', function(ref){
+      debugger;
+      document.getElementById('regForm').definition = ref.detail.value;
+    })
+  </script>
+</html>

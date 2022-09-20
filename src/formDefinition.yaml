@@ -1,0 +1,48 @@
+serviceConfig:
+  fields:
+    - name: cors-origins
+      plugin: cors
+      property: config.origin
+      label: Origins
+      type: switch
+      default: false
+    - name: cors-methods
+      plugin: cors
+      property: config.methods
+      type: checkbox
+      label: Headers
+      validationType: function
+      validationFunction: "function(val, fields){ return true;}"
+      options:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      default:
+        - GET
+        - POST
+      help: Blah blah2
+    #  layoutGrid:
+    #      grid-template-columns: 80px auto 80px
+    #      grid-template-rows: 100px 50px 100px
+  css:
+    grid-column: 3 / span 2
+    grid-row: third-line / 4
+routeConfig:
+  layoutGrid:
+      grid-template-columns: 80px auto 80px
+      grid-template-rows: 100px 50px 100px
+
+plugins:
+  - name: corsSupport
+
+fields:
+  - name: corsSupport
+    scope:
+    -	service
+    - route
+    default: false
+    fieldType: switch
+    label: CORS
+    pluginName: cors
+

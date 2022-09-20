@@ -1,0 +1,22 @@
+:host {
+  --md-sys-color-secondary-container: orange;
+  --md-sys-color-primary: black;
+  padding:40px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-rows: repeat(2, 40px 60px);
+  row-gap: 10px;
+
+  label {
+    padding-top:20px;
+  }
+
+  .checkboxgroup {
+    label {
+      margin-right:10px;
+      margin-left:5px;
+    }
+  }
+}
