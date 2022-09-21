@@ -48,19 +48,30 @@ export class RegForm extends LitElement {
     renderCheckboxGroup(field:any):TemplateResult {
         return html`
             <div class="checkboxgroup">
-            ${field.options.map((o:string) => html`<input type="checkbox" @click=${this._clickHandler} data-property=${field.property} data-plugin=${field.plugin} data-field-type=${field.type} value=${o}/><label>${o}</label>`)}
+            ${field.options.map((o:string) => html`<input type="checkbox" @click=${(evt:any) => this._clickHandler(evt, field)} value=${o}/><label>${o}</label>`)}
             </div>
         `;
     }
 
-    private _clickHandler(e: Event) {
+    renderTextField(field:any):TemplateResult {
+        return html`
+            <div class="textfield">
+            <input @input=${(evt:any) => this._handleInput(evt, field)} data-property=${field.property} value=${field.default}/>
+            </div>
+        `;
+    }
+
+
+
+    private _clickHandler(e: Event, field: any) {
         debugger;
         const ref: any = e.currentTarget;
         console.log(ref.outerHTML);
+        debugger;
 
-        const propId = ref.getAttribute('data-property');
-        const fieldType = ref.getAttribute('data-field-type');
-        const plugin = ref.getAttribute('data-plugin');
+        const propId = field.property;
+        const fieldType = field.type;
+        const plugin = field.plugin;
         const contextId = ref.closest('[data-context-name]').getAttribute('data-context-name');
         const contextType = ref.closest('[data-context-type]').getAttribute('data-context-type');
         const value = ref.value;
@@ -75,17 +86,32 @@ export class RegForm extends LitElement {
             }
         }
 
-        let pluginConfig:any = contextObj.plugins.find((ref:any) => ref.name === plugin);
-        if(!pluginConfig){
-            pluginConfig = {name:plugin};
-            contextObj.plugins.push(pluginConfig);
+        let pluginDef:any = contextObj.plugins.find((ref:any) => ref.name === plugin);
+        if(!pluginDef){
+            pluginDef = {name:plugin, config:{}};
+            contextObj.plugins.push(pluginDef);
         }
-
-        pluginConfig[propId] = pluginConfig[propId] || [];
-        pluginConfig[propId].push(value);
+        const pluginConfig: any = pluginDef.config;
+        const prop = propId.split('.')[1];
+        pluginConfig[prop] = pluginConfig[prop] || [];
+        if(ref.checked) {
+            pluginConfig[prop].push(value);
+        } else {
+            const index = pluginConfig[prop].indexOf(value);
+            if(index >= 0) {
+                pluginConfig[prop].splice(index, 1);
+            }
+        }
 
         this.dispatchEvent(new CustomEvent("change", {bubbles: true, composed:true, detail: { value: this.savedSettings} }));
 
+    }
+
+    private _handleInput(e: Event, field:any) {
+        debugger;
+        const ref: any = e.currentTarget;
+        console.log(ref.outerHTML);
+        console.log(field.name);
     }
 
     renderCheckbox(field:any): TemplateResult {
@@ -98,12 +124,18 @@ export class RegForm extends LitElement {
             case 'checkbox':
                 fieldDef = this.renderCheckboxGroup(field);
                 break;
+            case 'textfield':
+                fieldDef = this.renderTextField(field);
+                break;
         }
-
-        return html`
-            ${this.renderLabel(field)}
-            ${fieldDef}
-        `;
+        if(field.type === 'checkbox' || field.type==='textfield') {
+            return html`
+                ${this.renderLabel(field)}
+                ${fieldDef}
+            `;
+        } else {
+            return html``;
+        }
     }
 
     render(){

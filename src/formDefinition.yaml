@@ -4,8 +4,8 @@ serviceConfig:
       plugin: cors
       property: config.origin
       label: Origins
-      type: switch
-      default: false
+      type: textfield
+      default: http://mockbin.org
     - name: cors-methods
       plugin: cors
       property: config.methods
