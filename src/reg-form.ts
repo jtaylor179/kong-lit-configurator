@@ -1,12 +1,7 @@
 
-import {html, LitElement, css, TemplateResult} from "lit";
+import {CSSResultGroup, html, LitElement, TemplateResult} from "lit";
 import { customElement, property } from "lit/decorators.js";
 import styles  from './regEditor.scss';
-import './@material/web/badge/badge.ts';
-import './@material/web/actionelement/action-element';
-import './@material/web/button/tonal-button.ts';
-import './@material/web/textfield/outlined-text-field';
-import './@material/web/switch/switch';
 
 import {html as staticHtml} from 'lit/static-html.js';
 
@@ -14,7 +9,8 @@ import {html as staticHtml} from 'lit/static-html.js';
 // @ts-ignore
 @customElement('reg-form')
 export class RegForm extends LitElement {
-    static styles = styles;
+    // @ts-ignore
+    static styles: CSSResultGroup | undefined = styles;
     // static styles = css``;
 
     @property({type:Object})
@@ -61,22 +57,18 @@ export class RegForm extends LitElement {
         `;
     }
 
-
-
-    private _clickHandler(e: Event, field: any) {
-        debugger;
-        const ref: any = e.currentTarget;
-        console.log(ref.outerHTML);
-        debugger;
-
+    private _handleFieldUpdate(field:any, value:any, el:any,  action = 'set'){
         const propId = field.property;
-        const fieldType = field.type;
+
+
+
+        // const fieldType = field.type;
+        const isPlugin: boolean = !!field.plugin;
         const plugin = field.plugin;
-        const contextId = ref.closest('[data-context-name]').getAttribute('data-context-name');
-        const contextType = ref.closest('[data-context-type]').getAttribute('data-context-type');
-        const value = ref.value;
+        const contextId = el.closest('[data-context-name]').getAttribute('data-context-name');
+        const contextType = el.closest('[data-context-type]').getAttribute('data-context-type');
         const settings = this.savedSettings;
-        let contextObj:any = {name:contextId}, plugins:[];
+        let contextObj:any = {name:contextId, plugins:[], config:{}};
         if( contextType === 'service' ) {
             contextObj = settings.service;
         } else {
@@ -86,20 +78,44 @@ export class RegForm extends LitElement {
             }
         }
 
-        let pluginDef:any = contextObj.plugins.find((ref:any) => ref.name === plugin);
-        if(!pluginDef){
-            pluginDef = {name:plugin, config:{}};
-            contextObj.plugins.push(pluginDef);
+        debugger;
+        contextObj.config = contextObj.config || {};
+        let targetConfig:any = contextObj.config;
+        const prop = propId.split('.')[1] || propId;
+        if(isPlugin) {
+            let pluginDef: any = contextObj.plugins.find((ref: any) => ref.name === plugin);
+            if (!pluginDef) {
+                pluginDef = {name: plugin, config: {}};
+                contextObj.plugins.push(pluginDef);
+            }
+            targetConfig  = pluginDef.config;
+
+            //pluginConfig[prop] = pluginConfig[prop] || defaultVal;
+
+
         }
-        const pluginConfig: any = pluginDef.config;
-        const prop = propId.split('.')[1];
-        pluginConfig[prop] = pluginConfig[prop] || [];
-        if(ref.checked) {
-            pluginConfig[prop].push(value);
+         // set default Value
+        const defaults:any = {'array':[], 'string':'', number:0};
+        const defaultVal:any = defaults[field.dataType];
+        targetConfig[prop] = defaultVal;
+
+        // Translate function returns key value pairs
+        if(!!field.translateOutFn){
+            const fn = new Function('field', 'value', field.translateOutFn);
+            const updates  = fn.call(this, field, value) || {};
+            Object.assign(targetConfig, updates);
         } else {
-            const index = pluginConfig[prop].indexOf(value);
-            if(index >= 0) {
-                pluginConfig[prop].splice(index, 1);
+            if (field.dataType === 'array') {
+                if (action === 'set') {
+                    targetConfig[prop].push(value);
+                } else {
+                    const index = targetConfig[prop].indexOf(value);
+                    if (index >= 0) {
+                        targetConfig[prop].splice(index, 1);
+                    }
+                }
+            } else {
+                targetConfig[prop] = value;
             }
         }
 
@@ -107,16 +123,20 @@ export class RegForm extends LitElement {
 
     }
 
+    private _clickHandler(e: Event, field: any) {
+        const ref: any = e.currentTarget;
+        console.log(ref.outerHTML);
+        const action = ref.checked ? 'set':'unset';
+        this._handleFieldUpdate(field, ref.value, ref, action);
+    }
+
     private _handleInput(e: Event, field:any) {
-        debugger;
         const ref: any = e.currentTarget;
         console.log(ref.outerHTML);
         console.log(field.name);
+        this._handleFieldUpdate(field, ref.value, ref);
     }
 
-    renderCheckbox(field:any): TemplateResult {
-
-    }
 
     renderField(field:any):TemplateResult {
         let fieldDef: TemplateResult = html``;
@@ -141,9 +161,8 @@ export class RegForm extends LitElement {
     render(){
         return html`
 
-
+            
             <div class="grid-container" data-context-type="service" data-context-name="mockbin">
-
                 ${this.renderFields(this.definition!.fields || [])}
             </div>
             

@@ -1,7 +1,6 @@
 import {html, css, LitElement, PropertyValues} from "lit";
 import {customElement, property} from "lit/decorators.js";
 import * as yaml from 'js-yaml'
-import {CodeEditor} from "./code-editor";
 
 
 @customElement('config-form')

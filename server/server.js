@@ -1,6 +1,24 @@
 const express = require("express");
 const path = require("path");
 const app = express();
+
+const {NodeVM} = require('vm2');
+
+const vm = new NodeVM({
+    console: 'inherit',
+    sandbox: {},
+    require: {
+        external: true,
+        builtin: ['fs', 'path'],
+        root: './',
+        mock: {
+            fs: {
+                readFileSync: () => 'Nice try!'
+            }
+        }
+    }
+});
+
 app.use("/", express.static(path.join(__dirname, "public")));
 app.get("/api/v1", (req, res) => {
     res.json({
@@ -12,6 +30,16 @@ app.get("/api/v1", (req, res) => {
 app.get('/api/formDefinition', function(req, res){
     res.sendFile(path.resolve('../src/formDefinition.yaml'));
 });
+
+app.get('/api/formeval', function(req, res){
+    // Sync
+
+    let functionInSandbox = vm.run('module.exports = function(who){ return {"hello": who}; }');
+    res.json(functionInSandbox('world'));
+
+});
+
+
 app.get("/*", (_req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 })

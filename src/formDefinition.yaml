@@ -1,10 +1,24 @@
 serviceConfig:
   fields:
+    - name: general
+      property: host
+      type: textfield
+      label: host
+      default: https://mockbin.org/testpath
+      dataType: string
+      translateOutFn: >
+        const urlSpec = new URL(value);
+        return {"host": urlSpec.host, "protocol": urlSpec.protocol, "path": urlSpec.pathname};
+      translateInFn: >
+        const urlSpec = new URL(value);
+        const parts = [urlSpec.protocol, urlSpec.host, urlSpec.pathname];
+        return {};
     - name: cors-origins
       plugin: cors
       property: config.origin
       label: Origins
       type: textfield
+      dataType: array
       default: http://mockbin.org
     - name: cors-methods
       plugin: cors
@@ -19,8 +33,6 @@ serviceConfig:
         - PUT
         - DELETE
       default:
-        - GET
-        - POST
       help: Blah blah2
     #  layoutGrid:
     #      grid-template-columns: 80px auto 80px
