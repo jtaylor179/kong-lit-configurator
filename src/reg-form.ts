@@ -4,6 +4,8 @@ import { customElement, property } from "lit/decorators.js";
 import styles  from './regEditor.scss';
 
 import {html as staticHtml} from 'lit/static-html.js';
+import {observer} from "./@material/web/compat/base/observer";
+import * as yaml from "js-yaml";
 
 
 // @ts-ignore
@@ -14,10 +16,20 @@ export class RegForm extends LitElement {
     // static styles = css``;
 
     @property({type:Object})
-    definition:any = {};
+    formDefinition:any = {};
+
+    @property()
+    contextType: string = 'service';
+
+    @property()
+    routeName?: string;
+
 
     @property( { type: Object})
-    savedSettings: any = { service:{ plugins: []}, routes: []};
+    @observer(function(this: RegForm) {
+        console.log(JSON.stringify(this.savedSettings));
+    })
+    savedSettings: any = { services : [{ plugins: [], routes: []}]};
 
     protected renderMenuSurface(sTag:string): TemplateResult {
         return staticHtml`<${sTag}
@@ -41,18 +53,18 @@ export class RegForm extends LitElement {
         return html`<label>${field.label}</label>`;
     }
 
-    renderCheckboxGroup(field:any):TemplateResult {
+    renderCheckboxGroup(field:any, value:string[] = []):TemplateResult {
         return html`
             <div class="checkboxgroup">
-            ${field.options.map((o:string) => html`<input type="checkbox" @click=${(evt:any) => this._clickHandler(evt, field)} value=${o}/><label>${o}</label>`)}
+            ${field.options.map((o:string) => html`<input type="checkbox" ?checked=${value.indexOf(o) !== -1} @click=${(evt:any) => this._clickHandler(evt, field)} value=${o}/><label>${o}</label>`)}
             </div>
         `;
     }
 
-    renderTextField(field:any):TemplateResult {
+    renderTextField(field:any, value:string):TemplateResult {
         return html`
             <div class="textfield">
-            <input @input=${(evt:any) => this._handleInput(evt, field)} data-property=${field.property} value=${field.default}/>
+            <input @input=${(evt:any) => this._handleInput(evt, field)} data-property=${field.property} value=${value}/>
             </div>
         `;
     }
@@ -60,17 +72,15 @@ export class RegForm extends LitElement {
     private _handleFieldUpdate(field:any, value:any, el:any,  action = 'set'){
         const propId = field.property;
 
-
-
         // const fieldType = field.type;
         const isPlugin: boolean = !!field.plugin;
         const plugin = field.plugin;
         const contextId = el.closest('[data-context-name]').getAttribute('data-context-name');
         const contextType = el.closest('[data-context-type]').getAttribute('data-context-type');
         const settings = this.savedSettings;
-        let contextObj:any = {name:contextId, plugins:[], config:{}};
+        let contextObj:any;
         if( contextType === 'service' ) {
-            contextObj = settings.service;
+            contextObj = settings.services[0];
         } else {
             contextObj = settings.routes.find((ref:any) => ref.name === contextId)
             if(!contextObj){
@@ -78,10 +88,7 @@ export class RegForm extends LitElement {
             }
         }
 
-        debugger;
-        contextObj.config = contextObj.config || {};
-        let targetConfig:any = contextObj.config;
-        const prop = propId.split('.')[1] || propId;
+        let targetConfig:any = contextObj;
         if(isPlugin) {
             let pluginDef: any = contextObj.plugins.find((ref: any) => ref.name === plugin);
             if (!pluginDef) {
@@ -97,7 +104,7 @@ export class RegForm extends LitElement {
          // set default Value
         const defaults:any = {'array':[], 'string':'', number:0};
         const defaultVal:any = defaults[field.dataType];
-        targetConfig[prop] = defaultVal;
+        targetConfig[propId] = targetConfig[propId]  || defaultVal;
 
         // Translate function returns key value pairs
         if(!!field.translateOutFn){
@@ -107,15 +114,15 @@ export class RegForm extends LitElement {
         } else {
             if (field.dataType === 'array') {
                 if (action === 'set') {
-                    targetConfig[prop].push(value);
+                    targetConfig[propId].push(value);
                 } else {
-                    const index = targetConfig[prop].indexOf(value);
+                    const index = targetConfig[propId].indexOf(value);
                     if (index >= 0) {
-                        targetConfig[prop].splice(index, 1);
+                        targetConfig[propId].splice(index, 1);
                     }
                 }
             } else {
-                targetConfig[prop] = value;
+                targetConfig[propId] = value;
             }
         }
 
@@ -137,15 +144,49 @@ export class RegForm extends LitElement {
         this._handleFieldUpdate(field, ref.value, ref);
     }
 
+    private getDataRoot(){
+        const root:any = this.savedSettings || {};
+        const rootService:any = root.services && root.services.length > 0 ? root.services[0]  : { routes:[], plugins:[]};
+        if(this.contextType === 'service'){
+            return rootService;
+        } else {
+            return rootService.routes.find( (ref:any) => ref.name === this.routeName) || {};
+        }
+
+    }
+
+    private getPropertyValue(dataContext:any, field:any, defaultValue:any){
+        let val:any = defaultValue;
+        if(typeof field.property === 'object'){
+            const fn = new Function('field', field.property.in);
+            val = fn.call(dataContext, field) || defaultValue;
+        } else {
+            return
+        }
+        return val;
+    }
 
     renderField(field:any):TemplateResult {
         let fieldDef: TemplateResult = html``;
+        // get field value;
+        const defaults:any = {'array':[], 'string':'', number:0};
+        const dataContext:any = this.getDataRoot();
+        let fieldValue:any =  defaults[field.dataType];
+
+        if(field.plugin){
+            const pluginData:any = dataContext.plugins.find((ref:any) => ref.name === field.plugin);
+            if(pluginData && pluginData.config){
+                fieldValue = this.getPropertyValue(pluginData, field.property, fieldValue);
+            }
+        } else {
+            fieldValue = this.getPropertyValue(dataContext, field, fieldValue);
+        }
         switch(field.type){
             case 'checkbox':
-                fieldDef = this.renderCheckboxGroup(field);
+                fieldDef = this.renderCheckboxGroup(field, fieldValue);
                 break;
             case 'textfield':
-                fieldDef = this.renderTextField(field);
+                fieldDef = this.renderTextField(field, fieldValue);
                 break;
         }
         if(field.type === 'checkbox' || field.type==='textfield') {
@@ -163,7 +204,7 @@ export class RegForm extends LitElement {
 
             
             <div class="grid-container" data-context-type="service" data-context-name="mockbin">
-                ${this.renderFields(this.definition!.fields || [])}
+                ${this.renderFields(this.formDefinition!.fields || [])}
             </div>
             
 

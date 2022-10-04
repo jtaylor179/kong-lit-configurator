@@ -50,7 +50,7 @@ export class MainApp extends LitElement {
     `;
 
     @state()
-    currentKongConfig: string = '#TODO';
+    currentFormConfiguration: string = '#TODO';
 
     @state()
     currentRegState: any = {};
@@ -65,53 +65,13 @@ export class MainApp extends LitElement {
         const ref:any  = yaml.load(this.currentDeckRegistration);
         this.currentRegState = ref;
     })
-    currentDeckRegistration: string = '_format_version: "3.0"\n' +
-        'services:\n' +
-        '- connect_timeout: 60000\n' +
-        '  host: \n' +
-        '  name: \n' +
-        '  port: 443\n' +
-        '  protocol: https\n' +
-        '  read_timeout: 60000\n' +
-        '  retries: 5\n' +
-        '  write_timeout: 60000\n' +
-        '  routes:\n' +
-        '  - name: root\n' +
-        '    paths:\n' +
-        '    - /\n' +
-        '    preserve_host: false\n' +
-        '    protocols:\n' +
-        '    - http\n' +
-        '    - https\n' +
-        '    regex_priority: 0\n' +
-        '    strip_path: true\n' +
-        '  plugins:\n' +
-        '  - name: cors\n' +
-        '    config:\n' +
-        '      origins:\n' +
-        '      - http://mockbin.com\n' +
-        '      methods:\n' +
-        '      - GET\n' +
-        '      - POST\n' +
-        '      headers:\n' +
-        '      - Accept\n' +
-        '      - Accept-Version\n' +
-        '      - Content-Length\n' +
-        '      - Content-MD5\n' +
-        '      - Content-Type\n' +
-        '      - Date\n' +
-        '      - X-Auth-Token\n' +
-        '      exposed_headers:\n' +
-        '      - X-Auth-Token\n' +
-        '      credentials: true\n' +
-        '      max_age: 3600\n' +
-        '\n';
+    currentDeckRegistration: string = '_format_version: "3.0"\n';
 
 
     render(){
         return html`
             <div class="main-layout">
-                <config-form id="configForm" style="width:500px;flex:1;position: relative" @change="${this._handleConfigChange}" currentKongConfig=${this.currentKongConfig} ></config-form>
+                <config-form id="configForm" style="width:500px;flex:1;position: relative" @change="${this._handleConfigChange}" formConfiguration=${this.currentFormConfiguration} ></config-form>
                 <div class="pageLayout">
                     <div class="leftNav">
                         <div>Service</div>
@@ -127,7 +87,7 @@ export class MainApp extends LitElement {
                             <md-tonal-button label="Transformations"></md-tonal-button>
                             <md-tonal-button label="Validation"></md-tonal-button>
                         </div>
-                        <reg-form id="regForm" @change="${this._handleFormInput}"></reg-form>
+                        <reg-form id="regForm" .savedSettings=${this.currentRegState} @change="${this._handleFormInput}"></reg-form>
                     </div>
                 </div>
                 <code-editor id="codeEditor" style="flex:1"   code=${this.currentDeckRegistration} language="yaml">
@@ -140,14 +100,19 @@ export class MainApp extends LitElement {
 
     protected async firstUpdated() {
         const resp = await fetch('http://localhost:3000/api/formDefinition');
-        let data = await resp.text();
+        const definition = await resp.text();
         // const ref  = yaml.load(data);
         // this.updateRegForm(ref);
-        this.updateConfigForm(data); //
+
+        const exampleResp = await fetch('http://localhost:3000/api/loadRegistration');
+        const currentReg = await exampleResp.text();
+        this.currentDeckRegistration = currentReg;
+
+        this.updateConfigForm(definition); //
     }
 
     updateConfigForm(sConfig:string){
-        this.currentKongConfig = sConfig;
+        this.currentFormConfiguration = sConfig;
         console.log(sConfig);
 
     }
@@ -159,18 +124,24 @@ export class MainApp extends LitElement {
         const currentService: any = this.getService();
         console.log(JSON.stringify(currentService));
 
-        const svcConfig = updateRoot.service.config
+        const svcConfig = updateRoot.service;
         for(const prop in svcConfig){
-            currentService[prop] = svcConfig[prop];
+            if(prop !== 'plugins') {
+                currentService[prop] = svcConfig[prop];
+            }
         }
 
         // Update demo plugin {"service":{"plugins":[{"name":"cors","config.methods":["DELETE"]}]},"routes":[]}
-        const updatePlugins = updateRoot.service!.plugins || [];
+        const updatePlugins = updateRoot.services![0]!.plugins || [];
         updatePlugins.forEach((updatePlugin:any)=> {
-            const svcPlugin: any = currentService.plugins.find((p:any) => p.name === updatePlugin.name);
-            const config: any = svcPlugin.config;
-            for(const prop in updatePlugin.config){
-                config[prop] = updatePlugin.config[prop];
+            let svcPlugin: any = currentService.plugins.find((p:any) => p.name === updatePlugin.name);
+            if(!svcPlugin){
+                currentService.plugins.push(updatePlugin);
+            } else {
+                const config: any = svcPlugin.config;
+                for (const prop in updatePlugin.config) {
+                    config[prop] = updatePlugin.config[prop];
+                }
             }
         });
 
@@ -199,7 +170,7 @@ export class MainApp extends LitElement {
     updateRegForm(ref:any){
         const regForm:RegForm = this.renderRoot.querySelector('reg-form') as RegForm;
         if(regForm) {
-            regForm.definition = ref.serviceConfig;
+            regForm.formDefinition = ref.serviceConfig;
         }
     }
 }

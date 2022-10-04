@@ -31,6 +31,10 @@ app.get('/api/formDefinition', function(req, res){
     res.sendFile(path.resolve('../src/formDefinition.yaml'));
 });
 
+app.get('/api/loadRegistration', function(req, res){
+    res.sendFile(path.resolve('../src/deckExample2.yaml'));
+});
+
 app.get('/api/formeval', function(req, res){
     // Sync
 

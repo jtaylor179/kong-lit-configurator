@@ -10,20 +10,24 @@ export class ConfigForm extends LitElement {
     `;
 
     @property({type:String})
-    currentKongConfig:string = '---';
+    formConfiguration:string = '---';
 
     protected async firstUpdated(_changedProperties: PropertyValues) {
         super.firstUpdated(_changedProperties);
     }
 
-    handleChange(evt:any){
+    handleChange(evt:any) {
         evt.stopPropagation();
-        const ref  = yaml.load(evt.detail.value);
-        console.log(JSON.stringify(ref));
-        this.dispatchEvent(new CustomEvent("change", {bubbles: true, composed:true, detail: { value: ref} }));
+        if (!!evt.detail.value) {
+            const ref = yaml.load(evt.detail.value);
+            if(ref) {
+                console.log(JSON.stringify(ref));
+                this.dispatchEvent(new CustomEvent("change", {bubbles: true, composed: true, detail: {value: ref}}));
+            }
+        }
     }
 
     render(){
-        return html`<code-editor @change=${this.handleChange} code=${this.currentKongConfig || '---'} language="yaml"></code-editor>`;
+        return html`<code-editor @change=${this.handleChange} code=${this.formConfiguration || '---'} language="yaml"></code-editor>`;
     }
 }

@@ -1,28 +1,32 @@
 serviceConfig:
   fields:
     - name: general
-      property: host
+    #  property: upstreamUrl
       type: textfield
-      label: host
-      default: https://mockbin.org/testpath
+      label: Upstream URL
+      default:
       dataType: string
-      translateOutFn: >
-        const urlSpec = new URL(value);
-        return {"host": urlSpec.host, "protocol": urlSpec.protocol, "path": urlSpec.pathname};
-      translateInFn: >
-        const urlSpec = new URL(value);
-        const parts = [urlSpec.protocol, urlSpec.host, urlSpec.pathname];
-        return {};
+      property:
+        out: >
+          const urlSpec = new URL(value);
+          return {"host": urlSpec.host, "protocol": urlSpec.protocol, "path": urlSpec.pathname};
+        in: >
+          if(this.host){
+            return this.protocol + '://' + this.host + (this.pathname ? this.pathname : '' );
+          } else {
+            return '';
+          }
     - name: cors-origins
       plugin: cors
-      property: config.origin
+      property: origin
       label: Origins
       type: textfield
       dataType: array
-      default: http://mockbin.org
+      default:
     - name: cors-methods
       plugin: cors
-      property: config.methods
+      dataType: array
+      property: methods
       type: checkbox
       label: Headers
       validationType: function
