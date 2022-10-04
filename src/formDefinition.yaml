@@ -12,7 +12,7 @@ serviceConfig:
           return {"host": urlSpec.host, "protocol": urlSpec.protocol, "path": urlSpec.pathname};
         in: >
           if(this.host){
-            return this.protocol + '://' + this.host + (this.pathname ? this.pathname : '' );
+            return this.protocol + '://' + this.host + (this.path ? this.path : '' );
           } else {
             return '';
           }

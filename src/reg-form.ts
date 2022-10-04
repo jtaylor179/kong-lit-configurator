@@ -159,11 +159,11 @@ export class RegForm extends LitElement {
         let val:any = defaultValue;
         if(typeof field.property === 'object'){
             const fn = new Function('field', field.property.in);
-            val = fn.call(dataContext, field) || defaultValue;
+            val = fn.call(dataContext, field);
         } else {
-            return
+            val = field.plugin ?  dataContext.config[field.property] : dataContext[field.property];
         }
-        return val;
+        return val || defaultValue;
     }
 
     renderField(field:any):TemplateResult {
@@ -176,7 +176,7 @@ export class RegForm extends LitElement {
         if(field.plugin){
             const pluginData:any = dataContext.plugins.find((ref:any) => ref.name === field.plugin);
             if(pluginData && pluginData.config){
-                fieldValue = this.getPropertyValue(pluginData, field.property, fieldValue);
+                fieldValue = this.getPropertyValue(pluginData, field, fieldValue);
             }
         } else {
             fieldValue = this.getPropertyValue(dataContext, field, fieldValue);
