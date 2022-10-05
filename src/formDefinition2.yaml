@@ -23,8 +23,8 @@ registrationConfig:
         default:
         dataType: string
         property:
-          out: 'const urlSpec = new URL(value); return {"host": urlSpec.host, "protocol":
-            urlSpec.protocol, "path": urlSpec.pathname};
+          out: 'const urlSpec = new URL(value); return {"host": urlSpec.hostname, "protocol":
+            urlSpec.protocol.replace(":",""), "path": urlSpec.pathname, "port": (urlSpec.port ? parseInt(urlSpec.port): 80)};
 
             '
           in: |
