@@ -7,8 +7,12 @@ registrationConfig:
     - service
     items:
     - itemType: container
-      containerRenderer: |
-        return html`<div><label style="display:block">subitems</label>${this.renderSubItems(items)}</div>`;
+      containerRenderer: >
+        return html`<div>
+                <label style="display:block">before items</label>
+                ${this.renderSubItems(items)}
+                <div>footer example</div>
+                </div>`;
       style: 'border: 1px solid red;'
       class: defaultContainer
       items:

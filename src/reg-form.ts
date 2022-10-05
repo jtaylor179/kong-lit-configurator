@@ -211,9 +211,7 @@ export class RegForm extends LitElement {
     renderContainer(refContainer:any):TemplateResult{
         const items = refContainer.items || [];
         if(!!refContainer.containerRenderer){
-            debugger;
             const fn = new Function('items', 'html', refContainer.containerRenderer);
-            const subItems:TemplateResult  = fn.call(this, items, html) || {};
             return html`${fn.call(this, items, html)}`;
         } else {
             return html`
