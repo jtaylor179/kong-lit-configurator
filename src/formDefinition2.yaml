@@ -36,6 +36,8 @@ registrationConfig:
     - itemRef: corsMethodsField
   - name: Authentication
     label: Authentication
+    items:
+      - itemRef: demoContainer
   - name: Security
     label: Security
   - name: Traffic
@@ -43,6 +45,11 @@ registrationConfig:
   - name: Validation
     label: Validation
   itemDefinitions:
+    demoContainer:
+      itemType: container
+      items: []
+      containerRenderer: >
+        return html`<div>ref container example</div>`;
     corsMethodsField:
       itemType: field
       name: cors-methods
