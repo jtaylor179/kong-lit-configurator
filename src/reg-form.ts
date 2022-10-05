@@ -72,9 +72,8 @@ export class RegForm extends LitElement {
     }
 
     private _handleFieldUpdate(field:any,  value:any,  action = 'set'){
-        const propId = field.property;
+        const prop = field.property;
 
-        // const fieldType = field.type;
         const isPlugin: boolean = !!field.plugin;
         const plugin = field.plugin;
         let targetConfig:any = this.getDataRoot(true);
@@ -86,31 +85,32 @@ export class RegForm extends LitElement {
                 targetConfig.plugins.push(pluginDef);
             }
             targetConfig  = pluginDef.config;
-
-
         }
          // set default Value
-        const defaults:any = {'array':[], 'string':'', number:0};
-        const defaultVal:any = defaults[field.dataType];
-        targetConfig[propId] = targetConfig[propId]  || defaultVal;
+        // const defaults:any = {'array':[], 'string':'', number:0};
+        // const defaultVal:any = defaults[field.dataType];
+
+        // if(typeof(prop) !== 'object'){
+        //     targetConfig[prop] = targetConfig[prop] || defaultVal;
+        // }
 
         // Translate function returns key value pairs
-        if(!!field.translateOutFn){
-            const fn = new Function('field', 'value', field.translateOutFn);
+        if(typeof(prop) === 'object'){
+            const fn = new Function('field', 'value', prop.out);
             const updates  = fn.call(this, field, value) || {};
             Object.assign(targetConfig, updates);
         } else {
             if (field.dataType === 'array') {
                 if (action === 'set') {
-                    targetConfig[propId].push(value);
-                } else {
-                    const index = targetConfig[propId].indexOf(value);
+                    targetConfig[prop].push(value);
+                } else { // remove
+                    const index = targetConfig[prop].indexOf(value);
                     if (index >= 0) {
-                        targetConfig[propId].splice(index, 1);
+                        targetConfig[prop].splice(index, 1);
                     }
                 }
             } else {
-                targetConfig[propId] = value;
+                targetConfig[prop] = value;
             }
         }
 
