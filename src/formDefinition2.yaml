@@ -1,0 +1,67 @@
+---
+registrationConfig:
+  sections:
+  - name: ServiceGeneral
+    label: General
+    appliesTo:
+    - service
+    items:
+    - itemType: container
+      containerRenderer: |
+        return html`<div><label style="display:block">subitems</label>${this.renderSubItems(items)}</div>`;
+      style: 'border: 1px solid red;'
+      class: defaultContainer
+      items:
+      - itemType: field
+        name: upstreamUrl
+        type: textfield
+        label: Upstream URL
+        default:
+        dataType: string
+        property:
+          out: 'const urlSpec = new URL(value); return {"host": urlSpec.host, "protocol":
+            urlSpec.protocol, "path": urlSpec.pathname};
+
+            '
+          in: |
+            if(this.host){
+              return this.protocol + '://' + this.host + (this.path ? this.path : '' );
+            } else {
+              return '';
+            }
+    - itemRef: corsMethodsField
+  - name: Authentication
+    label: Authentication
+  - name: Security
+    label: Security
+  - name: Traffic
+    label: Traffic Control
+  - name: Validation
+    label: Validation
+  itemDefinitions:
+    corsMethodsField:
+      itemType: field
+      name: cors-methods
+      plugin: cors
+      dataType: array
+      property: methods
+      type: checkbox
+      label: Headers
+      validationType: function
+      validationFunction: function(val, fields){ return true;}
+      options:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      default:
+      help: Blah blah
+    corsOriginsField:
+      itemType: field
+      name: cors-origins
+      plugin: cors
+      property: origin
+      label: Origins
+      type: textfield
+      dataType: array
+      default:

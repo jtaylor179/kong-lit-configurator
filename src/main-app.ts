@@ -3,7 +3,7 @@ import {customElement, state} from "lit/decorators.js";
 import './code-editor';
 import './config-form';
 import './reg-form';
-import {RegForm} from "./reg-form";
+import './button-tabs';
 import * as yaml from 'js-yaml'
 import {observer} from "./@material/web/compat/base/observer";
 import {dump} from "js-yaml";
@@ -53,6 +53,10 @@ export class MainApp extends LitElement {
     currentFormConfiguration: string = '#TODO';
 
     @state()
+    registrationConfig: any = { sections: []};
+
+
+    @state()
     currentRegState: any = {};
 
     private getService():any {
@@ -68,6 +72,13 @@ export class MainApp extends LitElement {
     currentDeckRegistration: string = '_format_version: "3.0"\n';
 
 
+    @state()
+    currentRegistrationSection: string = 'ServiceGeneral';
+
+    private navigateSection(evt:any){
+        this.currentRegistrationSection = evt.detail.value;
+    }
+
     render(){
         return html`
             <div class="main-layout">
@@ -79,15 +90,8 @@ export class MainApp extends LitElement {
                         <div>Default</div>
                     </div>
                     <div class="mainBody">
-                        <div class="tabBar">
-                            <md-tonal-button label="General"></md-tonal-button>
-                            <md-tonal-button label="Authentication"></md-tonal-button>
-                            <md-tonal-button label="Security"></md-tonal-button>
-                            <md-tonal-button label="Traffic Control"></md-tonal-button>
-                            <md-tonal-button label="Transformations"></md-tonal-button>
-                            <md-tonal-button label="Validation"></md-tonal-button>
-                        </div>
-                        <reg-form id="regForm" .savedSettings=${this.currentRegState} @change="${this._handleFormInput}"></reg-form>
+                        <button-tabs @change=${this.navigateSection} currentTab=${this.currentRegistrationSection} .tabList=${this.registrationConfig.sections}></button-tabs>
+                        <reg-form id="regForm" .savedSettings=${this.currentRegState} .registrationConfig=${this.registrationConfig} section=${this.currentRegistrationSection} @change="${this._handleFormInput}"></reg-form>
                     </div>
                 </div>
                 <code-editor id="codeEditor" style="flex:1"   code=${this.currentDeckRegistration} language="yaml">
@@ -99,8 +103,8 @@ export class MainApp extends LitElement {
 
 
     protected async firstUpdated() {
-        const resp = await fetch('http://localhost:3000/api/formDefinition');
-        const definition = await resp.text();
+        // const resp = await fetch('http://localhost:3000/api/formDefinition');
+        // const definition = await resp.text();
         // const ref  = yaml.load(data);
         // this.updateRegForm(ref);
 
@@ -108,14 +112,21 @@ export class MainApp extends LitElement {
         const currentReg = await exampleResp.text();
         this.currentDeckRegistration = currentReg;
 
-        this.updateConfigForm(definition); //
+        // this.updateConfigForm(definition); //
+
+        const resp2 = await fetch('http://localhost:3000/api/formDefinition2');
+        const definition2 = await resp2.text();
+        this.currentFormConfiguration = definition2;
+        const ref:any  = yaml.load(definition2);
+        this.registrationConfig = ref.registrationConfig || [];
+
     }
 
-    updateConfigForm(sConfig:string){
-        this.currentFormConfiguration = sConfig;
-        console.log(sConfig);
-
-    }
+    // updateConfigForm(sConfig:string){
+    //     this.registrationConfig = sConfig;
+    //     console.log(sConfig);
+    //
+    // }
 
     private _handleFormInput(ref:any){
         const updateRoot:any = ref.detail.value;
@@ -157,7 +168,9 @@ export class MainApp extends LitElement {
     }
 
     _handleConfigChange(e:any){
-       this.updateRegForm(e.detail.value);
+       // this.updateRegForm(e.detail.value);
+        const reg = e.detail.value;
+        this.registrationConfig = !!reg.registrationConfig && !!reg.registrationConfig.sections ? reg.registrationConfig : { sections:[]};
     }
 
     // updateConfigForm(sUpdate:string){
@@ -167,10 +180,10 @@ export class MainApp extends LitElement {
     //     }
     // }
 
-    updateRegForm(ref:any){
-        const regForm:RegForm = this.renderRoot.querySelector('reg-form') as RegForm;
-        if(regForm) {
-            regForm.formDefinition = ref.serviceConfig;
-        }
-    }
+    // updateRegForm(ref:any){
+    //     const regForm:RegForm = this.renderRoot.querySelector('reg-form') as RegForm;
+    //     if(regForm) {
+    //         regForm.formDefinition = ref.registrationConfig;
+    //     }
+    // }
 }
