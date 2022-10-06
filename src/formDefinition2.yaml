@@ -1,0 +1,78 @@
+---
+registrationConfig:
+  sections:
+  - name: ServiceGeneral
+    label: General
+    appliesTo:
+    - service
+    items:
+    - itemType: container
+      containerRenderer: >
+        return html`<div>
+                <label style="display:block">before items</label>
+                ${this.renderSubItems(items)}
+                <div>footer example</div>
+                </div>`;
+      style: 'border: 1px solid red;'
+      class: defaultContainer
+      items:
+      - itemType: field
+        name: upstreamUrl
+        type: textfield
+        label: Upstream URL
+        default:
+        dataType: string
+        property:
+          out: 'const urlSpec = new URL(value); return {"host": urlSpec.hostname, "protocol":
+            urlSpec.protocol.replace(":",""), "path": urlSpec.pathname, "port": (urlSpec.port ? parseInt(urlSpec.port): 80)};
+
+            '
+          in: |
+            if(this.host){
+              return this.protocol + '://' + this.host + (this.path ? this.path : '' );
+            } else {
+              return '';
+            }
+    - itemRef: corsMethodsField
+  - name: Authentication
+    label: Authentication
+    items:
+      - itemRef: demoContainer
+  - name: Security
+    label: Security
+  - name: Traffic
+    label: Traffic Control
+  - name: Validation
+    label: Validation
+  itemDefinitions:
+    demoContainer:
+      itemType: container
+      items: []
+      containerRenderer: >
+        return html`<div>ref container example</div>`;
+    corsMethodsField:
+      itemType: field
+      name: cors-methods
+      plugin: cors
+      dataType: array
+      property: methods
+      type: checkbox
+      label: Headers
+      validationType: function
+      validationFunction: function(val, fields){ return true;}
+      options:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      default:
+      help: Blah blah
+    corsOriginsField:
+      itemType: field
+      name: cors-origins
+      plugin: cors
+      property: origin
+      label: Origins
+      type: textfield
+      dataType: array
+      default:

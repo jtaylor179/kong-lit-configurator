@@ -5,7 +5,6 @@ import styles  from './regEditor.scss';
 
 import {html as staticHtml} from 'lit/static-html.js';
 import {observer} from "./@material/web/compat/base/observer";
-import * as yaml from "js-yaml";
 
 
 // @ts-ignore
@@ -16,13 +15,16 @@ export class RegForm extends LitElement {
     // static styles = css``;
 
     @property({type:Object})
-    formDefinition:any = {};
+    registrationConfig:any = {};
 
     @property()
     contextType: string = 'service';
 
     @property()
     routeName?: string;
+
+    @property()
+    section: string = 'GeneralService';
 
 
     @property( { type: Object})
@@ -69,60 +71,46 @@ export class RegForm extends LitElement {
         `;
     }
 
-    private _handleFieldUpdate(field:any, value:any, el:any,  action = 'set'){
-        const propId = field.property;
+    private _handleFieldUpdate(field:any,  value:any,  action = 'set'){
+        const prop = field.property;
 
-        // const fieldType = field.type;
         const isPlugin: boolean = !!field.plugin;
         const plugin = field.plugin;
-        const contextId = el.closest('[data-context-name]').getAttribute('data-context-name');
-        const contextType = el.closest('[data-context-type]').getAttribute('data-context-type');
-        const settings = this.savedSettings;
-        let contextObj:any;
-        if( contextType === 'service' ) {
-            contextObj = settings.services[0];
-        } else {
-            contextObj = settings.routes.find((ref:any) => ref.name === contextId)
-            if(!contextObj){
-                settings.routes.push(contextObj);
-            }
-        }
+        let targetConfig:any = this.getDataRoot(true);
 
-        let targetConfig:any = contextObj;
         if(isPlugin) {
-            let pluginDef: any = contextObj.plugins.find((ref: any) => ref.name === plugin);
+            let pluginDef: any = targetConfig.plugins.find((ref: any) => ref.name === plugin);
             if (!pluginDef) {
                 pluginDef = {name: plugin, config: {}};
-                contextObj.plugins.push(pluginDef);
+                targetConfig.plugins.push(pluginDef);
             }
             targetConfig  = pluginDef.config;
-
-            //pluginConfig[prop] = pluginConfig[prop] || defaultVal;
-
-
         }
          // set default Value
-        const defaults:any = {'array':[], 'string':'', number:0};
-        const defaultVal:any = defaults[field.dataType];
-        targetConfig[propId] = targetConfig[propId]  || defaultVal;
+        // const defaults:any = {'array':[], 'string':'', number:0};
+        // const defaultVal:any = defaults[field.dataType];
+
+        // if(typeof(prop) !== 'object'){
+        //     targetConfig[prop] = targetConfig[prop] || defaultVal;
+        // }
 
         // Translate function returns key value pairs
-        if(!!field.translateOutFn){
-            const fn = new Function('field', 'value', field.translateOutFn);
+        if(typeof(prop) === 'object'){
+            const fn = new Function('field', 'value', prop.out);
             const updates  = fn.call(this, field, value) || {};
             Object.assign(targetConfig, updates);
         } else {
             if (field.dataType === 'array') {
                 if (action === 'set') {
-                    targetConfig[propId].push(value);
-                } else {
-                    const index = targetConfig[propId].indexOf(value);
+                    targetConfig[prop].push(value);
+                } else { // remove
+                    const index = targetConfig[prop].indexOf(value);
                     if (index >= 0) {
-                        targetConfig[propId].splice(index, 1);
+                        targetConfig[prop].splice(index, 1);
                     }
                 }
             } else {
-                targetConfig[propId] = value;
+                targetConfig[prop] = value;
             }
         }
 
@@ -134,23 +122,28 @@ export class RegForm extends LitElement {
         const ref: any = e.currentTarget;
         console.log(ref.outerHTML);
         const action = ref.checked ? 'set':'unset';
-        this._handleFieldUpdate(field, ref.value, ref, action);
+        this._handleFieldUpdate(field, ref.value, action);
     }
 
     private _handleInput(e: Event, field:any) {
         const ref: any = e.currentTarget;
         console.log(ref.outerHTML);
         console.log(field.name);
-        this._handleFieldUpdate(field, ref.value, ref);
+        this._handleFieldUpdate(field, ref.value);
     }
 
-    private getDataRoot(){
+    private getDataRoot(bCreate:boolean = false){
         const root:any = this.savedSettings || {};
         const rootService:any = root.services && root.services.length > 0 ? root.services[0]  : { routes:[], plugins:[]};
         if(this.contextType === 'service'){
             return rootService;
         } else {
-            return rootService.routes.find( (ref:any) => ref.name === this.routeName) || {};
+            let rootRoute = rootService.routes.find((ref: any) => ref.name === this.routeName);
+            if(!rootRoute && bCreate){
+                rootRoute = { name: this.routeName };
+                rootService.routes.push(rootRoute);
+            }
+            return rootRoute || {};
         }
 
     }
@@ -171,6 +164,7 @@ export class RegForm extends LitElement {
         // get field value;
         const defaults:any = {'array':[], 'string':'', number:0};
         const dataContext:any = this.getDataRoot();
+
         let fieldValue:any =  defaults[field.dataType];
 
         if(field.plugin){
@@ -199,15 +193,41 @@ export class RegForm extends LitElement {
         }
     }
 
-    render(){
+    renderSubItems(items:any[]):TemplateResult{
         return html`
+            ${items.map((ref:any) => {
+                if(ref.itemRef){
+                    ref = this.registrationConfig.itemDefinitions[ref.itemRef];
+                }
+                if(ref.itemType === 'container'){
+                    return this.renderContainer(ref);
+                } else {
+                    return this.renderField(ref);
+                }
+            })}
+        `;
+    }
 
-            
-            <div class="grid-container" data-context-type="service" data-context-name="mockbin">
-                ${this.renderFields(this.formDefinition!.fields || [])}
+    renderContainer(refContainer:any):TemplateResult{
+        const items = refContainer.items || [];
+        if(!!refContainer.containerRenderer){
+            const fn = new Function('items', 'html', refContainer.containerRenderer);
+            return html`${fn.call(this, items, html)}`;
+        } else {
+            return html`
+                <div class="container">
+                    ${this.renderSubItems(items)}
+                </div>
+            `;
+        }
+    }
+
+    render(){
+        const currentSection = this.registrationConfig.sections.find((ref:any) => ref.name === this.section) || { items:[] };
+        return html`
+            <div class="grid-container">
+                ${this.renderContainer(currentSection || { items :[]})}
             </div>
-            
-
         `;
     }
 }

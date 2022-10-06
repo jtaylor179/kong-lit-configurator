@@ -16,6 +16,11 @@ serviceConfig:
           } else {
             return '';
           }
+      property0:
+        out: >
+          return `${Date.now()}\`;
+        in: >
+          "return `${Date.now()}\`";
     - name: cors-origins
       plugin: cors
       property: origin
