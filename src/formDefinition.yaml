@@ -42,6 +42,7 @@ registrationConfig:
     label: Authentication
     items:
       - itemRef: demoContainer
+      - itemRef: corsMethodsField
   - name: Security
     label: Security
   - name: Traffic

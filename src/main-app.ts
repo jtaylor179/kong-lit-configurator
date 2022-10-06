@@ -86,6 +86,7 @@ export class MainApp extends LitElement {
 
     private setServiceContext(){
         this.contextType = 'service';
+        this.currentRouteName = null;
         this.currentRegistrationSection = 'ServiceSettings';
     }
 
@@ -93,7 +94,7 @@ export class MainApp extends LitElement {
         console.log(routeName);
         this.contextType = 'route';
         this.currentRegistrationSection = 'RouteSettings';
-       // this.currentRouteName = routeName;
+        this.currentRouteName = routeName;
     }
 
 
@@ -126,10 +127,11 @@ export class MainApp extends LitElement {
                     </div>
                     <div class="mainBody">
                         <button-tabs contextType=${this.contextType}  @change=${this.navigateSection} currentTab=${this.currentRegistrationSection} .tabList=${this.registrationConfig.sections}></button-tabs>
-                        <reg-form id="regForm" .savedSettings=${this.currentRegState} .registrationConfig=${this.registrationConfig} section=${this.currentRegistrationSection} @change="${this._handleFormInput}"></reg-form>
+                        <reg-form id="regForm" routeName=${this.currentRouteName} .savedSettings=${this.currentRegState} .registrationConfig=${this.registrationConfig} contextType=${this.contextType} section=${this.currentRegistrationSection} @change="${this._handleFormInput}"></reg-form>
                     </div>
                 </div>
                 <code-editor id="codeEditor" style="flex:1"   code=${this.currentDeckRegistration} language="yaml">
+                </code-editor>
                 </code-editor>
             </div>
         `;
