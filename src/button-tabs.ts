@@ -37,6 +37,9 @@ export class ButtonTabs extends LitElement {
     @property({type:Object})
     tabList: Object[] = [];
 
+    @property()
+    contextType: string = 'service';
+
     private _handleClick(tab:string){
         this.currentTab = tab;
         this.dispatchEvent(new CustomEvent("change", {bubbles: true, composed:true, detail: { value: tab} }));
@@ -46,7 +49,14 @@ export class ButtonTabs extends LitElement {
         return html`
             <div class="tabBar">
                 ${this.tabList.map((ref:any) => {
-                        return html`<md-filled-button @click=${() => this._handleClick(ref.name)} class="${classMap({'selected': this.currentTab === ref.name})}" label=${ref.label}></md-filled-button>`;
+                        if(!ref.restrictTo || ref.restrictTo === this.contextType) {
+                            return html`
+                                <md-filled-button @click=${() => this._handleClick(ref.name)}
+                                                  class="${classMap({'selected': this.currentTab === ref.name})}"
+                                                  label=${ref.label}></md-filled-button>`;
+                        } else {
+                            return null;
+                        }
                     })}
             </div>`;
     }

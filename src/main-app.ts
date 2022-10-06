@@ -17,6 +17,13 @@ export class MainApp extends LitElement {
         width:100%;
         height: 100%;
       }
+      .link {
+        color:blue;
+        cursor:pointer;
+      }
+      .link:hover {
+        text-decoration: underline;
+      }
       .main-layout {
         display: flex;
         flex:1;
@@ -55,12 +62,38 @@ export class MainApp extends LitElement {
     @state()
     registrationConfig: any = { sections: []};
 
+    @state()
+    contextType: string = 'service';
+
 
     @state()
     currentRegState: any = {};
 
+    @state()
+    currentRouteName: string | null = null;
+
     private getService():any {
-        return this.currentRegState.services![0];
+        if(this.currentRegState && this.currentRegState.services && this.currentRegState.services.length > 0) {
+            return this.currentRegState.services[0];
+        } else {
+            return { routes: []};
+        }
+    }
+
+    private getRoutes():any[] {
+        return this.getService().routes || [];
+    }
+
+    private setServiceContext(){
+        this.contextType = 'service';
+        this.currentRegistrationSection = 'ServiceSettings';
+    }
+
+    private setActiveRoute(routeName:string){
+        console.log(routeName);
+        this.contextType = 'route';
+        this.currentRegistrationSection = 'RouteSettings';
+       // this.currentRouteName = routeName;
     }
 
 
@@ -73,7 +106,7 @@ export class MainApp extends LitElement {
 
 
     @state()
-    currentRegistrationSection: string = 'ServiceGeneral';
+    currentRegistrationSection: string = 'ServiceSettings';
 
     private navigateSection(evt:any){
         this.currentRegistrationSection = evt.detail.value;
@@ -85,12 +118,14 @@ export class MainApp extends LitElement {
                 <config-form id="configForm" style="width:500px;flex:1;position: relative" @change="${this._handleConfigChange}" formConfiguration=${this.currentFormConfiguration} ></config-form>
                 <div class="pageLayout">
                     <div class="leftNav">
-                        <div>Service</div>
+                        <div class="link" @click=${this.setServiceContext}>Service</div>
                         <div>Routes</div>
-                        <div>Default</div>
+                        ${this.getRoutes().map((ref:any) => {
+                            return html`<div class="link" @click=${() => this.setActiveRoute(ref.name)}>${ref.name}</div>`;
+                        })}
                     </div>
                     <div class="mainBody">
-                        <button-tabs @change=${this.navigateSection} currentTab=${this.currentRegistrationSection} .tabList=${this.registrationConfig.sections}></button-tabs>
+                        <button-tabs contextType=${this.contextType}  @change=${this.navigateSection} currentTab=${this.currentRegistrationSection} .tabList=${this.registrationConfig.sections}></button-tabs>
                         <reg-form id="regForm" .savedSettings=${this.currentRegState} .registrationConfig=${this.registrationConfig} section=${this.currentRegistrationSection} @change="${this._handleFormInput}"></reg-form>
                     </div>
                 </div>
@@ -114,10 +149,10 @@ export class MainApp extends LitElement {
 
         // this.updateConfigForm(definition); //
 
-        const resp2 = await fetch('http://localhost:3000/api/formDefinition2');
-        const definition2 = await resp2.text();
-        this.currentFormConfiguration = definition2;
-        const ref:any  = yaml.load(definition2);
+        const resp = await fetch('http://localhost:3000/api/formDefinition');
+        const definition = await resp.text();
+        this.currentFormConfiguration = definition;
+        const ref:any  = yaml.load(definition);
         this.registrationConfig = ref.registrationConfig || [];
 
     }

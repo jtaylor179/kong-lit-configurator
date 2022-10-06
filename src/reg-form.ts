@@ -21,6 +21,10 @@ export class RegForm extends LitElement {
     contextType: string = 'service';
 
     @property()
+    @observer(function(this: RegForm) {
+        console.log(this.routeName);
+        this.contextType = !!this.routeName ? 'route':'service';
+    })
     routeName?: string;
 
     @property()
@@ -28,9 +32,6 @@ export class RegForm extends LitElement {
 
 
     @property( { type: Object})
-    @observer(function(this: RegForm) {
-        console.log(JSON.stringify(this.savedSettings));
-    })
     savedSettings: any = { services : [{ plugins: [], routes: []}]};
 
     protected renderMenuSurface(sTag:string): TemplateResult {
@@ -223,8 +224,6 @@ export class RegForm extends LitElement {
     }
 
     render(){
-        const val = eval('1 + 1');
-        console.log(val);
         const currentSection = this.registrationConfig.sections.find((ref:any) => ref.name === this.section) || { items:[] };
         return html`
             <div class="grid-container">

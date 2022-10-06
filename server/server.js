@@ -32,11 +32,11 @@ app.get('/api/formDefinition', function(req, res){
 });
 
 app.get('/api/formDefinition2', function(req, res){
-    res.sendFile(path.resolve('../src/formDefinition2.yaml'));
+    res.sendFile(path.resolve('../src/formDefinition.yaml'));
 });
 
 app.get('/api/loadRegistration', function(req, res){
-    res.sendFile(path.resolve('../src/deckExample2.yaml'));
+    res.sendFile(path.resolve('../src/deckExample.yaml'));
 });
 
 app.get('/api/formeval', function(req, res){
