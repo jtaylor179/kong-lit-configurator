@@ -223,6 +223,8 @@ export class RegForm extends LitElement {
     }
 
     render(){
+        const val = eval('1 + 1');
+        console.log(val);
         const currentSection = this.registrationConfig.sections.find((ref:any) => ref.name === this.section) || { items:[] };
         return html`
             <div class="grid-container">
