@@ -38,6 +38,13 @@ registrationConfig:
     restrictTo: route
     items:
       - itemRef: demoContainer
+      - itemType: field
+        name: path
+        type: textfield
+        label: Path
+        default:
+        dataType: string
+        property: path
   - name: Authentication
     label: Authentication
     items:

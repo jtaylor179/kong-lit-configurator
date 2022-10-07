@@ -9,6 +9,9 @@ import {observer} from "./@material/web/compat/base/observer";
 import {dump} from "js-yaml";
 import './@material/web/button/tonal-button.ts';
 import './@material/web/navigationtab/navigation-tab';
+import './@material/web/list/list';
+import './@material/web/list/list-item';
+import {classMap} from "lit/directives/class-map.js";
 
 @customElement('main-app')
 export class MainApp extends LitElement {
@@ -16,13 +19,14 @@ export class MainApp extends LitElement {
       :host {
         width:100%;
         height: 100%;
+        --md-list-list-item-one-line-container-height: 30px;
       }
       .link {
         color:blue;
         cursor:pointer;
       }
       .link:hover {
-        text-decoration: underline;
+        // text-decoration: underline;
       }
       .main-layout {
         display: flex;
@@ -35,11 +39,17 @@ export class MainApp extends LitElement {
       }
       .leftNav {
         width:150px;
-        background-color:#CCC;
+        padding-top:100px;
       }
       .mainBody {
         width: 850px;
         padding:20px;
+        background-color: white;
+        z-index: 100;
+      }
+      .selectedNav {
+        // --md-list-list-item-container-color:blue;
+        text-decoration: underline;
       }
       .tabBar {
         // max-width: calc(100% - 2 * 40px);
@@ -54,6 +64,8 @@ export class MainApp extends LitElement {
         --md-tonal-button-hover-container-elevation-shadow: none;
       
       }
+      
+      .
     `;
 
     @state()
@@ -119,11 +131,14 @@ export class MainApp extends LitElement {
                 <config-form id="configForm" style="width:500px;flex:1;position: relative" @change="${this._handleConfigChange}" formConfiguration=${this.currentFormConfiguration} ></config-form>
                 <div class="pageLayout">
                     <div class="leftNav">
-                        <div class="link" @click=${this.setServiceContext}>Service</div>
-                        <div>Routes</div>
+                        <md-list>
+                        <md-list-item class="${classMap({'link':true, 'selectedNav': this.contextType === 'service'})}" @click=${this.setServiceContext} headline="Service"></md-list-item>
+                        <md-list-item headline="Routes" style="--md-ripple-hover-state-layer-color:transparent;"></md-list-item>
+                        
                         ${this.getRoutes().map((ref:any) => {
-                            return html`<div class="link" @click=${() => this.setActiveRoute(ref.name)}>${ref.name}</div>`;
+                            return html`<md-list-item class="${classMap({'link':true, 'selectedNav': this.currentRouteName === ref.name})}" headline=${ref.name} @click=${() => this.setActiveRoute(ref.name)}></md-list-item>`;
                         })}
+                        </md-list>
                     </div>
                     <div class="mainBody">
                         <button-tabs contextType=${this.contextType}  @change=${this.navigateSection} currentTab=${this.currentRegistrationSection} .tabList=${this.registrationConfig.sections}></button-tabs>
