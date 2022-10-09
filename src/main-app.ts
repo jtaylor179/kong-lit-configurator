@@ -104,8 +104,9 @@ export class MainApp extends LitElement {
 
     private setActiveRoute(routeName:string){
         console.log(routeName);
+        const nextSection = this.contextType === 'service' ? 'RouteSettings' : this.currentRegistrationSection;
         this.contextType = 'route';
-        this.currentRegistrationSection = 'RouteSettings';
+        this.currentRegistrationSection = nextSection;
         this.currentRouteName = routeName;
     }
 

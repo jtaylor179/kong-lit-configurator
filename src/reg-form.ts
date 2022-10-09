@@ -59,7 +59,7 @@ export class RegForm extends LitElement {
     renderCheckboxGroup(field:any, value:string[] = []):TemplateResult {
         return html`
             <div class="checkboxgroup">
-            ${field.options.map((o:string) => html`<input type="checkbox" ?checked=${value.indexOf(o) !== -1} @click=${(evt:any) => this._clickHandler(evt, field)} value=${o}/><label>${o}</label>`)}
+            ${field.options.map((o:string) => html`<input type="checkbox" .checked=${value.indexOf(o) !== -1} @click=${(evt:any) => this._clickHandler(evt, field)} value=${o}/><label>${o}</label>`)}
             </div>
         `;
     }
@@ -67,7 +67,9 @@ export class RegForm extends LitElement {
     renderTextField(field:any, value:string):TemplateResult {
         return html`
             <div class="textfield">
-            <input @input=${(evt:any) => this._handleInput(evt, field)} data-property=${field.property} value=${value}/>
+            ${value}
+                <br>
+            <input @input=${(evt:any) => this._handleInput(evt, field)}  .value=${value}/>
             </div>
         `;
     }
@@ -77,7 +79,7 @@ export class RegForm extends LitElement {
 
         const isPlugin: boolean = !!field.plugin;
         const plugin = field.plugin;
-        let targetConfig:any = this.getDataRoot(true);
+        let targetConfig:any = this.getDataRoot();
 
         if(isPlugin) {
             let pluginDef: any = targetConfig.plugins.find((ref: any) => ref.name === plugin);
@@ -102,6 +104,9 @@ export class RegForm extends LitElement {
             Object.assign(targetConfig, updates);
         } else {
             if (field.dataType === 'array') {
+                if(!Array.isArray(targetConfig[prop])){
+                    targetConfig[prop] = [];
+                }
                 if (action === 'set') {
                     targetConfig[prop].push(value);
                 } else { // remove
@@ -133,18 +138,19 @@ export class RegForm extends LitElement {
         this._handleFieldUpdate(field, ref.value);
     }
 
-    private getDataRoot(bCreate:boolean = false){
+    private getDataRoot(){
         const root:any = this.savedSettings || {};
         const rootService:any = root.services && root.services.length > 0 ? root.services[0]  : { routes:[], plugins:[]};
         if(this.contextType === 'service'){
             return rootService;
         } else {
             let rootRoute = rootService.routes.find((ref: any) => ref.name === this.routeName);
-            if(!rootRoute && bCreate){
-                rootRoute = { name: this.routeName };
+            if(!rootRoute){
+                rootRoute = { name: this.routeName, plugins:[]};
                 rootService.routes.push(rootRoute);
             }
-            return rootRoute || {};
+            rootRoute.plugins = rootRoute.plugins ?? []
+            return rootRoute;
         }
 
     }
