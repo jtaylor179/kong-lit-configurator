@@ -28,6 +28,10 @@ export class MainApp extends LitElement {
       .link:hover {
         // text-decoration: underline;
       }
+      .tab-row {
+        display: flex;
+        align-items: center;
+      }
       .main-layout {
         display: flex;
         flex:1;
@@ -64,8 +68,6 @@ export class MainApp extends LitElement {
         --md-tonal-button-hover-container-elevation-shadow: none;
       
       }
-      
-      .
     `;
 
     @state()
@@ -90,6 +92,18 @@ export class MainApp extends LitElement {
         } else {
             return { routes: []};
         }
+    }
+
+    private async syncToKong() {
+        debugger;
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name: this.getService().name, deck: this.currentDeckRegistration})
+        };
+        await fetch('http://localhost:3000/api/runKongSync', requestOptions);
+        // .then(response => response.json())
+        // .then(data => element.innerHTML = data.id );
     }
 
     private getRoutes():any[] {
@@ -142,7 +156,7 @@ export class MainApp extends LitElement {
                         </md-list>
                     </div>
                     <div class="mainBody">
-                        <button-tabs contextType=${this.contextType}  @change=${this.navigateSection} currentTab=${this.currentRegistrationSection} .tabList=${this.registrationConfig.sections}></button-tabs>
+                        <div class="tab-row"><button-tabs style="width:800px" contextType=${this.contextType}  @change=${this.navigateSection} currentTab=${this.currentRegistrationSection} .tabList=${this.registrationConfig.sections}></button-tabs><button @click=${this.syncToKong} class="SyncButton">Sync</button></div>
                         <reg-form id="regForm" routeName=${this.currentRouteName} .savedSettings=${this.currentRegState} .registrationConfig=${this.registrationConfig} contextType=${this.contextType} section=${this.currentRegistrationSection} @change="${this._handleFormInput}"></reg-form>
                     </div>
                 </div>

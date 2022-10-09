@@ -142,6 +142,7 @@ export class RegForm extends LitElement {
         const root:any = this.savedSettings || {};
         const rootService:any = root.services && root.services.length > 0 ? root.services[0]  : { routes:[], plugins:[]};
         if(this.contextType === 'service'){
+            rootService.plugins = rootService.plugins ?? []
             return rootService;
         } else {
             let rootRoute = rootService.routes.find((ref: any) => ref.name === this.routeName);

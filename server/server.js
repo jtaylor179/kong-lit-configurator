@@ -3,6 +3,12 @@ const path = require("path");
 const app = express();
 
 const {NodeVM} = require('vm2');
+const {exec} = require("child_process");
+const bodyParser = require("express");
+const fs = require("fs");
+//Here we are configuring express to use body-parser as middle-ware.
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 const vm = new NodeVM({
     console: 'inherit',
@@ -24,6 +30,36 @@ app.get("/api/v1", (req, res) => {
     res.json({
         project: "React and Express Boilerplate",
         from: "Vanaldito",
+    });
+});
+
+app.post('/api/runKongSync', async function(req, resp){
+    const { exec } = require("child_process");
+
+    //To access POST variable use req.body()methods.
+    console.log(req.body);
+    const update = req.body;
+
+    const fs = require('fs').promises;
+
+    const data = "Hello my name is Hugo, I'm using the new fs promises API";
+
+    try {
+        await fs.writeFile(path.resolve('./kong/' + update.name + '.yaml'), update.deck); // need to be in an async function
+    } catch (error) {
+        console.log(error)
+    }
+
+    exec("cd kong && deck sync -s " + update.name + ".yaml", (error, stdout, stderr) => {
+        if (error) {
+            console.log(`error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.log(`stderr: ${stderr}`);
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
     });
 });
 

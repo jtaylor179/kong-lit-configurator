@@ -1,69 +1,31 @@
 _format_version: "1.1"
 services:
 - connect_timeout: 60000
-  host: mockbin.org
-  name: service1
-  path: /api/service1
+  enabled: true
+  host: httpbin.org
+  name: ABC
+  path: /anything
   port: 80
-  protocol: http
+  protocol: https
   read_timeout: 60000
   retries: 5
-  write_timeout: 60000
   routes:
-  - name: CreateBin
-    methods:
-    - POST
-    paths:
-    - /bin/create
-    preserve_host: false
-    protocols:
-    - http
-    - https
-    regex_priority: 0
-    strip_path: true
-  - name: RequestBin
+  - hosts:
+    - abc123
+    https_redirect_status_code: 426
     methods:
     - GET
+    - POST
+    name: myfirstroute
+    path_handling: v0
     paths:
-    - /bin
+    - /myfirstroute
     preserve_host: false
     protocols:
     - http
     - https
     regex_priority: 0
+    request_buffering: true
+    response_buffering: true
     strip_path: true
-  plugins:
-  - name: key-auth
-    config:
-      anonymous: null
-      hide_credentials: false
-      key_in_body: false
-      key_names:
-      - apikey
-      run_on_preflight: true
-    enabled: true
-    run_on: first
-    protocols:
-    - grpc
-    - grpcs
-    - http
-    - https
-  - name: cors
-    config:
-      origins:
-      - http://mockbin.com
-      methods:
-      - GET
-      - POST
-      headers:
-      - Accept
-      - Accept-Version
-      - Content-Length
-      - Content-MD5
-      - Content-Type
-      - Date
-      - X-Auth-Token
-      exposed_headers:
-      - X-Auth-Token
-      credentials: true
-      max_age: 3600
+  write_timeout: 60000

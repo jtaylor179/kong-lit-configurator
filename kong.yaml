@@ -1,0 +1,45 @@
+_format_version: '1.1'
+services:
+  - connect_timeout: 60000
+    enabled: true
+    host: httpbin.org
+    name: ABC
+    path: /anything
+    plugins:
+      - config:
+          methods:
+            - DELETE
+            - PUT
+        name: cors
+    port: 80
+    protocol: https
+    read_timeout: 60000
+    retries: 5
+    routes:
+      - hosts:
+          - abc123
+        https_redirect_status_code: 426
+        methods:
+          - GET
+          - POST
+        name: myfirstroute
+        path_handling: v0
+        paths:
+          - /myfirstroute
+        plugins:
+          - config:
+              methods:
+                - DELETE
+                - PUT
+                - POST
+                - GET
+            name: cors
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        request_buffering: true
+        response_buffering: true
+        strip_path: true
+    write_timeout: 60000
