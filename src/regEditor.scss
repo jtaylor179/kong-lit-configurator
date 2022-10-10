@@ -9,6 +9,10 @@
   grid-template-rows: repeat(2, 20px 40px);
   row-gap: 10px;
 
+  .textfield {
+    margin-bottom:20px;
+  }
+
   label {
     padding-top:0px;
   }

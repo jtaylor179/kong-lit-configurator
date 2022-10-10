@@ -67,9 +67,7 @@ export class RegForm extends LitElement {
     renderTextField(field:any, value:string):TemplateResult {
         return html`
             <div class="textfield">
-            ${value}
-                <br>
-            <input @input=${(evt:any) => this._handleInput(evt, field)}  .value=${value}/>
+            <input @input=${(evt:any) => this._handleTextInput(evt, field)}  .value=${value}/>
             </div>
         `;
     }
@@ -89,13 +87,6 @@ export class RegForm extends LitElement {
             }
             targetConfig  = pluginDef.config;
         }
-         // set default Value
-        // const defaults:any = {'array':[], 'string':'', number:0};
-        // const defaultVal:any = defaults[field.dataType];
-
-        // if(typeof(prop) !== 'object'){
-        //     targetConfig[prop] = targetConfig[prop] || defaultVal;
-        // }
 
         // Translate function returns key value pairs
         if(typeof(prop) === 'object'){
@@ -109,6 +100,8 @@ export class RegForm extends LitElement {
                 }
                 if (action === 'set') {
                     targetConfig[prop].push(value);
+                } else if (action === 'replace') {
+                    targetConfig[prop] = value;
                 } else { // remove
                     const index = targetConfig[prop].indexOf(value);
                     if (index >= 0) {
@@ -131,11 +124,17 @@ export class RegForm extends LitElement {
         this._handleFieldUpdate(field, ref.value, action);
     }
 
-    private _handleInput(e: Event, field:any) {
+    private _handleTextInput(e: Event, field:any) {
         const ref: any = e.currentTarget;
         console.log(ref.outerHTML);
         console.log(field.name);
-        this._handleFieldUpdate(field, ref.value);
+        let actionType = 'set';
+        let value = ref.value;
+        if(field.dataType === 'array'){
+            actionType = 'replace';
+            value = ref.value.split(',');
+        }
+        this._handleFieldUpdate(field, value, actionType);
     }
 
     private getDataRoot(){

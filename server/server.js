@@ -33,8 +33,11 @@ app.get("/api/v1", (req, res) => {
     });
 });
 
-app.post('/api/runKongSync', async function(req, resp){
+app.post('/api/runKongSync/:svcname', async function(req, resp){
     const { exec } = require("child_process");
+
+    const svc = req.params.svcname;
+    const outfile = svc + ".yaml";
 
     //To access POST variable use req.body()methods.
     console.log(req.body);
@@ -45,12 +48,13 @@ app.post('/api/runKongSync', async function(req, resp){
     const data = "Hello my name is Hugo, I'm using the new fs promises API";
 
     try {
-        await fs.writeFile(path.resolve('./kong/' + update.name + '.yaml'), update.deck); // need to be in an async function
+        await fs.writeFile(path.resolve('./kong/' + outfile), update.deck); // need to be in an async function
     } catch (error) {
         console.log(error)
     }
 
-    exec("cd kong && deck sync -s " + update.name + ".yaml", (error, stdout, stderr) => {
+    // select-tag
+    exec("cd kong && deck sync -s " + outfile, (error, stdout, stderr) => {
         if (error) {
             console.log(`error: ${error.message}`);
             return;
@@ -71,8 +75,52 @@ app.get('/api/formDefinition2', function(req, res){
     res.sendFile(path.resolve('../src/formDefinition.yaml'));
 });
 
-app.get('/api/loadRegistration', function(req, res){
+app.get('/api/loadRegistration/:svcname', function(req, res){
+    const svc = req.params.svcname;
+    const outfile = svc + ".yaml";
+    const fullpath = path.resolve('./kong/' + outfile);
+    console.log(outfile);
+    try {
+        fs.unlinkSync(fullpath);
+        //file removed
+    } catch(err) {
+        console.error(err)
+    }
+    // res.sendFile(path.resolve('./kong/' + outfile));
+    exec("cd kong && deck dump --select-tag " + svc + " -o " + outfile, (error, stdout, stderr) => {
+        if (error) {
+            console.log(`error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.log(`stderr: ${stderr}`);
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+        res.sendFile(path.resolve('./kong/' + outfile));
+    });
+
+});
+
+app.get('/api/loadRegistration8/:svcname', function(req, res){
+    const svc = req.params.svcname;
+    const outfile = svc + ".yaml";
     res.sendFile(path.resolve('../src/deckExample.yaml'));
+    // res.sendFile(path.resolve('./kong/' + outfile));
+    // console.log(outfile);
+    // exec("cd kong && deck dump --select-tag " + svc + " -o " + outfile, (error, stdout, stderr) => {
+    //     if (error) {
+    //         console.log(`error: ${error.message}`);
+    //         return;
+    //     }
+    //     if (stderr) {
+    //         console.log(`stderr: ${stderr}`);
+    //         return;
+    //     }
+    //     console.log(`stdout: ${stdout}`);
+    //     res.sendFile(path.resolve('./kong/' + outfile));
+    // });
+
 });
 
 app.get('/api/formeval', function(req, res){

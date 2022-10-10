@@ -16,6 +16,11 @@ registrationConfig:
       class: defaultContainer
       items:
       - itemType: field
+        type: textfield
+        label: Tags
+        dataType: array
+        property: tags
+      - itemType: field
         name: upstreamUrl
         type: textfield
         label: Upstream URL

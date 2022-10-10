@@ -101,7 +101,7 @@ export class MainApp extends LitElement {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({name: this.getService().name, deck: this.currentDeckRegistration})
         };
-        await fetch('http://localhost:3000/api/runKongSync', requestOptions);
+        await fetch('http://localhost:3000/api/runKongSync/svc-abc', requestOptions);
         // .then(response => response.json())
         // .then(data => element.innerHTML = data.id );
     }
@@ -175,7 +175,7 @@ export class MainApp extends LitElement {
         // const ref  = yaml.load(data);
         // this.updateRegForm(ref);
 
-        const exampleResp = await fetch('http://localhost:3000/api/loadRegistration');
+        const exampleResp = await fetch('http://localhost:3000/api/loadRegistration/svc-abc');
         const currentReg = await exampleResp.text();
         this.currentDeckRegistration = currentReg;
 
