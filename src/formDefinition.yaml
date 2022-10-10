@@ -48,8 +48,8 @@ registrationConfig:
         type: textfield
         label: Path
         default:
-        dataType: string
-        property: path
+        dataType: array
+        property: paths
   - name: Authentication
     label: Authentication
     items:
