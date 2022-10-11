@@ -16,10 +16,9 @@ services:
       headers: null
       max_age: null
       methods:
-      - DELETE
-      - PUT
       - POST
       - GET
+      - PUT
       origins: null
       preflight_continue: false
     enabled: true

@@ -75,7 +75,7 @@ registrationConfig:
       dataType: array
       property: methods
       type: checkbox
-      label: Headers
+      label: CORS Methods
       validationType: function
       validationFunction: function(val, fields){ return true;}
       options:
