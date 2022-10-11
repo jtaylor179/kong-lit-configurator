@@ -53,13 +53,13 @@ export class RegForm extends LitElement {
     }
 
     renderLabel(field:any):TemplateResult{
-        return html`<label>${field.label}</label>`;
+        return html`<label class="fieldLabel">${field.label}</label>`;
     }
 
     renderCheckboxGroup(field:any, value:string[] = []):TemplateResult {
         return html`
             <div class="checkboxgroup">
-            ${field.options.map((o:string) => html`<input type="checkbox" .checked=${value.indexOf(o) !== -1} @click=${(evt:any) => this._clickHandler(evt, field)} value=${o}/><label>${o}</label>`)}
+            ${field.options.map((o:string) => html`<md-checkbox type="checkbox" .checked=${value.indexOf(o) !== -1} @change=${(evt:any) => this._changeHandler(evt, field)} value=${o}></md-checkbox><label>${o}</label>`)}
             </div>
         `;
     }
@@ -67,7 +67,7 @@ export class RegForm extends LitElement {
     renderTextField(field:any, value:string):TemplateResult {
         return html`
             <div class="textfield">
-            <input @input=${(evt:any) => this._handleTextInput(evt, field)}  .value=${value}/>
+            <md-outlined-text-field @input=${(evt:any) => this._handleTextInput(evt, field)}  .value=${value}/>
             </div>
         `;
     }
@@ -117,7 +117,9 @@ export class RegForm extends LitElement {
 
     }
 
-    private _clickHandler(e: Event, field: any) {
+    private _changeHandler(e: Event, field: any) {
+        e.preventDefault();
+        e.stopPropagation();
         const ref: any = e.currentTarget;
         console.log(ref.outerHTML);
         const action = ref.checked ? 'set':'unset';

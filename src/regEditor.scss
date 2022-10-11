@@ -4,20 +4,24 @@
   padding:40px;
 }
 
+
+.fieldLabel {
+  padding-top:0px;
+}
+
 .grid-container {
   display: grid;
   grid-template-rows: repeat(2, 20px 40px);
   row-gap: 10px;
 
   .textfield {
-    margin-bottom:20px;
+    margin:15px 0px 20px 0px;
   }
 
-  label {
-    padding-top:0px;
-  }
 
   .checkboxgroup {
+    display:flex;
+    align-items: center;
     label {
       margin-right:10px;
       margin-left:5px;

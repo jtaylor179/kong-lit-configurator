@@ -17,6 +17,9 @@ services:
       max_age: null
       methods:
       - DELETE
+      - PUT
+      - POST
+      - GET
       origins: null
       preflight_continue: false
     enabled: true
@@ -35,8 +38,8 @@ services:
     - abc123
     https_redirect_status_code: 426
     methods:
-    - GET
-    - POST
+    - PUT
+    - DELETE
     name: myfirstroute
     path_handling: v0
     paths:

@@ -11,6 +11,8 @@ import './@material/web/button/tonal-button.ts';
 import './@material/web/navigationtab/navigation-tab';
 import './@material/web/list/list';
 import './@material/web/list/list-item';
+import './@material/web/textfield/outlined-text-field';
+import './@material/web/checkbox/checkbox';
 import {classMap} from "lit/directives/class-map.js";
 
 @customElement('main-app')
@@ -20,6 +22,7 @@ export class MainApp extends LitElement {
         width:100%;
         height: 100%;
         --md-list-list-item-one-line-container-height: 30px;
+        --md-outlined-field-container-height: 20px;
       }
       .link {
         color:blue;
@@ -50,6 +53,7 @@ export class MainApp extends LitElement {
         padding:20px;
         background-color: white;
         z-index: 100;
+        --md-outlined-text-field-container-height:30px;
       }
       .selectedNav {
         // --md-list-list-item-container-color:blue;
@@ -95,7 +99,6 @@ export class MainApp extends LitElement {
     }
 
     private async syncToKong() {
-        debugger;
         const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},

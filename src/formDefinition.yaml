@@ -8,9 +8,9 @@ registrationConfig:
     - itemType: container
       containerRenderer: >
         return html`<div>
-                <label style="display:block">before items</label>
+                <label style="display:block">---</label>
                 ${this.renderSubItems(items)}
-                <div>footer example</div>
+                <div>---</div>
                 </div>`;
       style: 'border: 1px solid red;'
       class: defaultContainer
@@ -50,6 +50,7 @@ registrationConfig:
         default:
         dataType: array
         property: paths
+      - itemRef: methodsField
   - name: Authentication
     label: Authentication
     items:
@@ -93,3 +94,18 @@ registrationConfig:
       type: textfield
       dataType: array
       default:
+    methodsField:
+      itemType: field
+      name: methods
+      property: methods
+      label: Methods
+      type: checkbox
+      dataType: array
+      default:
+      - GET
+      - POST
+      options:
+      - GET
+      - POST
+      - PUT
+      - DELETE
