@@ -13,6 +13,7 @@ import './@material/web/list/list';
 import './@material/web/list/list-item';
 import './@material/web/textfield/outlined-text-field';
 import './@material/web/checkbox/checkbox';
+import './@material/web/icon/icon';
 import {classMap} from "lit/directives/class-map.js";
 
 @customElement('main-app')
@@ -45,7 +46,7 @@ export class MainApp extends LitElement {
         padding:0px;
       }
       .leftNav {
-        width:150px;
+        width:170px;
         padding-top:100px;
       }
       .mainBody {
@@ -54,6 +55,9 @@ export class MainApp extends LitElement {
         background-color: white;
         z-index: 100;
         --md-outlined-text-field-container-height:30px;
+      }
+      .routePrefix {
+        margin-left:20px;
       }
       .selectedNav {
         // --md-list-list-item-container-color:blue;
@@ -151,10 +155,17 @@ export class MainApp extends LitElement {
                     <div class="leftNav">
                         <md-list>
                         <md-list-item class="${classMap({'link':true, 'selectedNav': this.contextType === 'service'})}" @click=${this.setServiceContext} headline="Service"></md-list-item>
-                        <md-list-item headline="Routes" style="--md-ripple-hover-state-layer-color:transparent;"></md-list-item>
+                        <md-list-item headline="Routes" style="--md-ripple-hover-state-layer-color:transparent;">
+                            
+                        </md-list-item>
                         
                         ${this.getRoutes().map((ref:any) => {
-                            return html`<md-list-item class="${classMap({'link':true, 'selectedNav': this.currentRouteName === ref.name})}" headline=${ref.name} @click=${() => this.setActiveRoute(ref.name)}></md-list-item>`;
+                            return html`<md-list-item class="${classMap({'link':true, 'selectedNav': this.currentRouteName === ref.name})}" headline=${ref.name} @click=${() => this.setActiveRoute(ref.name)}>
+                                  <span class="routePrefix" slot="start">
+                            <md-icon class="mdc-button__icon">
+                                  alt_route
+                                </md-icon>
+                            </span></md-list-item>`;
                         })}
                         </md-list>
                     </div>
