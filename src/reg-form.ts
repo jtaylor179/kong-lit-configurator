@@ -65,9 +65,10 @@ export class RegForm extends LitElement {
     }
 
     renderTextField(field:any, value:string):TemplateResult {
+        const type = field.dataType === 'number'?  'number':'text';
         return html`
             <div class="textfield">
-            <md-outlined-text-field @input=${(evt:any) => this._handleTextInput(evt, field)}  .value=${value}/>
+            <md-outlined-text-field @input=${(evt:any) => this._handleTextInput(evt, field)} type=${type} .value=${value}/>
             </div>
         `;
     }
@@ -77,6 +78,9 @@ export class RegForm extends LitElement {
 
         const isPlugin: boolean = !!field.plugin;
         const plugin = field.plugin;
+        if(field.dataType === 'number'){
+            value = Number(value);
+        }
         let targetConfig:any = this.getDataRoot();
 
         if(isPlugin) {
@@ -171,7 +175,7 @@ export class RegForm extends LitElement {
     renderField(field:any):TemplateResult {
         let fieldDef: TemplateResult = html``;
         // get field value;
-        const defaults:any = {'array':[], 'string':'', number:0};
+        const defaults:any = {'array':[], 'string':'', 'number':0};
         const dataContext:any = this.getDataRoot();
 
         let fieldValue:any =  defaults[field.dataType];

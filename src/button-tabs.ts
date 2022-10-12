@@ -9,9 +9,8 @@ export class ButtonTabs extends LitElement {
     static styles = css`
       .tabBar {
         // max-width: calc(100% - 2 * 40px);
-        width:800px;
         margin: 0 auto;
-        padding: 16px 40px;
+        padding: 16px 40px 16px 0;
         border-bottom: 1px solid grey;
         text-align: center;
         white-space: nowrap;

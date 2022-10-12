@@ -15,6 +15,7 @@ registrationConfig:
       style: 'border: 1px solid red;'
       class: defaultContainer
       items:
+      - itemRef: nameField
       - itemType: field
         type: textfield
         label: Tags
@@ -38,6 +39,7 @@ registrationConfig:
               return '';
             }
     - itemRef: corsMethodsField
+    - itemRef: corsMaxAge
   - name: RouteSettings
     label: Route Settings
     restrictTo: route
@@ -68,6 +70,13 @@ registrationConfig:
       items: []
       containerRenderer: >
         return html`<div>ref container example</div>`;
+    nameField:
+      itemType: field
+      name: name
+      property: name
+      type: textfield
+      label: Name
+      dataType: string
     corsMethodsField:
       itemType: field
       name: cors-methods
@@ -85,6 +94,14 @@ registrationConfig:
       - DELETE
       default:
       help: Blah blah
+    corsMaxAge:
+      itemType: field
+      name: cors-max-age
+      label: CORS Max Age
+      plugin: cors
+      property: max_age
+      type: textfield
+      dataType: number
     corsOriginsField:
       itemType: field
       name: cors-origins

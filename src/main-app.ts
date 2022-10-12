@@ -1,5 +1,5 @@
 import { html, css, LitElement} from "lit";
-import {customElement, state} from "lit/decorators.js";
+import {customElement, query, state} from "lit/decorators.js";
 import './code-editor';
 import './config-form';
 import './reg-form';
@@ -29,12 +29,27 @@ export class MainApp extends LitElement {
         color:blue;
         cursor:pointer;
       }
+      #favDialog {
+        height:200px;
+        width:300px;
+        z-index: 1000;
+      }
+      #txtOpenAPI{
+          height: 128px;
+          width: 290px; 
+      }
       .link:hover {
         // text-decoration: underline;
       }
       .tab-row {
         display: flex;
         align-items: center;
+      }
+      .linkButton {
+        text-decoration: underline;
+        border:none;
+        background-color: transparent;
+        color:blue;
       }
       .main-layout {
         display: flex;
@@ -77,6 +92,9 @@ export class MainApp extends LitElement {
       
       }
     `;
+
+    @query('#favDialog') importOpenAPIModal!: HTMLElement;
+    @query('#txtOpenAPI') txtOpenAPISpec!: HTMLTextAreaElement;
 
     @state()
     currentFormConfiguration: string = '#TODO';
@@ -131,6 +149,27 @@ export class MainApp extends LitElement {
         this.currentRouteName = routeName;
     }
 
+    private async importOpenAPISpec(){
+        const spec = this.txtOpenAPISpec.value;
+        // todo: add validation
+        this.isImportModalVisible = false;
+        const requestOptions = {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({"spec":spec})
+        };
+        const resp = await fetch('http://localhost:3000/api/translateOpenAPI', requestOptions);
+        const specTxt = await resp.json();
+        const updateState = dump(specTxt, {
+            // 'styles': {
+            //     '!!null': 'canonical' // dump null as ~
+            // },
+            // 'sortKeys': true        // sort object keys
+        });
+
+        this.currentDeckRegistration = updateState;
+    }
+
 
     @state()
     @observer(function(this: MainApp) {
@@ -143,12 +182,40 @@ export class MainApp extends LitElement {
     @state()
     currentRegistrationSection: string = 'ServiceSettings';
 
+    @state()
+    isImportModalVisible: boolean = false;
+
     private navigateSection(evt:any){
         this.currentRegistrationSection = evt.detail.value;
     }
 
+    private showImport(){
+        this.isImportModalVisible = true;
+    }
+
     render(){
         return html`
+            <dialog id="favDialog" @close=${this.importOpenAPISpec} ?open=${this.isImportModalVisible}>
+                <form method="dialog">
+                    <div>
+                        <label>Import Open API Spec</label>
+                        <textarea id="txtOpenAPI">openapi: "3.0.0"
+info:
+version: 1.0.0
+title: Swagger Petstore
+servers:
+- url: http://petstore.swagger.io/v1
+paths:
+  /pets:
+    get:
+      summary: Get all pets</textarea>
+                    </div>
+                    <div>
+                        <button value="cancel">Cancel</button>
+                        <button id="confirmBtn" value="default">Confirm</button>
+                    </div>
+                </form>
+            </dialog>
             <div class="main-layout">
                 <config-form id="configForm" style="width:500px;flex:1;position: relative" @change="${this._handleConfigChange}" formConfiguration=${this.currentFormConfiguration} ></config-form>
                 <div class="pageLayout">
@@ -170,7 +237,10 @@ export class MainApp extends LitElement {
                         </md-list>
                     </div>
                     <div class="mainBody">
-                        <div class="tab-row"><button-tabs style="width:800px" contextType=${this.contextType}  @change=${this.navigateSection} currentTab=${this.currentRegistrationSection} .tabList=${this.registrationConfig.sections}></button-tabs><button @click=${this.syncToKong} class="SyncButton">Sync</button></div>
+                        <div class="tab-row"><button-tabs style="width:800px" contextType=${this.contextType}  @change=${this.navigateSection} currentTab=${this.currentRegistrationSection} .tabList=${this.registrationConfig.sections}></button-tabs>
+                            <button @click=${this.syncToKong} class="linkButton">Sync</button>
+                            <button @click=${this.showImport} class="linkButton">Import OpenAPI</button>
+                        </div>
                         <reg-form id="regForm" routeName=${this.currentRouteName} .savedSettings=${this.currentRegState} .registrationConfig=${this.registrationConfig} contextType=${this.contextType} section=${this.currentRegistrationSection} @change="${this._handleFormInput}"></reg-form>
                     </div>
                 </div>
@@ -209,6 +279,7 @@ export class MainApp extends LitElement {
     //
     // }
 
+
     private _handleFormInput(ref:any){
         const updateRoot:any = ref.detail.value;
         console.log(JSON.stringify(updateRoot));
@@ -238,10 +309,10 @@ export class MainApp extends LitElement {
         });
 
         const updateState = dump(this.currentRegState, {
-            'styles': {
-                '!!null': 'canonical' // dump null as ~
-            },
-            'sortKeys': true        // sort object keys
+            // 'styles': {
+            //     '!!null': 'canonical' // dump null as ~
+            // },
+            // 'sortKeys': true        // sort object keys
         });
 
         this.currentDeckRegistration = updateState;

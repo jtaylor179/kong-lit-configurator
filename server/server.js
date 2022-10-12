@@ -6,6 +6,7 @@ const {NodeVM} = require('vm2');
 const {exec} = require("child_process");
 const bodyParser = require("express");
 const fs = require("fs");
+const {generateFromString, ConversionResultType} = require("openapi-2-kong");
 //Here we are configuring express to use body-parser as middle-ware.
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -65,6 +66,40 @@ app.post('/api/runKongSync/:svcname', async function(req, resp){
         }
         console.log(`stdout: ${stdout}`);
     });
+});
+
+app.post('/api/translateOpenAPI', async function(req, resp){
+    try {
+    const type = 'kong-declarative-config';
+    const tags = [  ];
+    let spec = `
+        openapi: "3.0.0"
+        info:
+          version: 1.0.0
+          title: Swagger Petstore
+        servers:
+          - url: http://petstore.swagger.io/v1
+        paths:
+          /pets:
+            get:
+              summary: Get all pets
+        `;
+
+    //To access POST variable use req.body()methods.
+    console.log(req.body.spec);
+    spec = req.body.spec || spec;
+
+    console.log(typeof spec);
+    //  spec = decodeURI(req.body.spec);
+
+     // console.log(JSON.stringify(spec));
+
+    const result = await generateFromString(spec, type, tags);
+    //return     resp.json(result.documents[0]);
+    resp.json(result.documents[0]);
+    } catch(e){
+        resp.json({ok:false});
+    }
 });
 
 app.get('/api/formDefinition', function(req, res){

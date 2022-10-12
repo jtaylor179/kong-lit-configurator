@@ -14,11 +14,12 @@ services:
       credentials: false
       exposed_headers: null
       headers: null
-      max_age: null
+      max_age: 1000
       methods:
       - POST
       - GET
       - PUT
+      - DELETE
       origins: null
       preflight_continue: false
     enabled: true
@@ -42,7 +43,7 @@ services:
     name: myfirstroute
     path_handling: v0
     paths:
-    - /myfirstroute
+    - /myfirstroute2
     plugins:
     - config:
         credentials: false

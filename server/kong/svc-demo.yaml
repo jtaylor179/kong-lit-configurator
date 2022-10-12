@@ -1,0 +1,19 @@
+_format_version: '1.1'
+services:
+  - name: openapi
+    protocol: http
+    host: petstore.swagger.io
+    port: 80
+    path: /v1
+    plugins: []
+    routes:
+      - tags:
+          - OAS3_import
+        name: openapi-pets-get
+        methods:
+          - GET
+        paths:
+          - /pets$
+        strip_path: false
+    tags:
+      - OAS3_import
