@@ -1,0 +1,174 @@
+_format_version: "1.1"
+consumers:
+- acls:
+  - group: abc-group
+  custom_id: mycustomid
+  keyauth_credentials:
+  - key: 6l432SSBM5iGdaKLvVsnduKyCePLFVkF
+  username: jat80080
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: test.org
+  name: abc
+  path: /anything
+  plugins:
+  - config:
+      allow:
+      - abc-group
+      deny: null
+      hide_groups_header: false
+    enabled: true
+    name: acl
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  - config:
+      credentials: false
+      exposed_headers: null
+      headers: null
+      max_age: 1000
+      methods:
+      - POST
+      - GET
+      - PUT
+      - DELETE
+      origins: null
+      preflight_continue: false
+    enabled: true
+    name: cors
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - svc-abc
+  - config:
+      anonymous: null
+      hide_credentials: false
+      key_in_body: false
+      key_in_header: true
+      key_in_query: true
+      key_names:
+      - apikey
+      run_on_preflight: true
+    enabled: true
+    name: key-auth
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  port: 80
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - hosts:
+    - abc123
+    https_redirect_status_code: 426
+    methods:
+    - PUT
+    - DELETE
+    name: myfirstroute
+    path_handling: v0
+    paths:
+    - /myfirstroute2
+    plugins:
+    - config:
+        credentials: false
+        exposed_headers: null
+        headers: null
+        max_age: null
+        methods:
+        - DELETE
+        origins: null
+        preflight_continue: false
+      enabled: true
+      name: cors
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+      tags:
+      - svc-abc
+    - config:
+        anonymous: null
+        hide_credentials: false
+        key_in_body: false
+        key_in_header: true
+        key_in_query: true
+        key_names:
+        - apikey
+        run_on_preflight: true
+      enabled: true
+      name: key-auth
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+    tags:
+    - svc-abc
+  tags:
+  - svc-abc
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: petstore.swagger.io
+  name: openapi
+  path: /v1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    methods:
+    - GET
+    name: openapi-pets-get
+    path_handling: v0
+    paths:
+    - /pets$
+    plugins:
+    - config:
+        anonymous: null
+        hide_credentials: false
+        key_in_body: false
+        key_in_header: true
+        key_in_query: true
+        key_names:
+        - apikey
+        run_on_preflight: true
+      enabled: true
+      name: key-auth
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: false
+    tags:
+    - OAS3_import
+  tags:
+  - OAS3_import
+  write_timeout: 60000

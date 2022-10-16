@@ -90,9 +90,7 @@ app.post('/api/translateOpenAPI', async function(req, resp){
     spec = req.body.spec || spec;
 
     console.log(typeof spec);
-    //  spec = decodeURI(req.body.spec);
 
-     // console.log(JSON.stringify(spec));
 
     const result = await generateFromString(spec, type, tags);
     //return     resp.json(result.documents[0]);

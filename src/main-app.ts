@@ -14,6 +14,9 @@ import './@material/web/list/list-item';
 import './@material/web/textfield/outlined-text-field';
 import './@material/web/checkbox/checkbox';
 import './@material/web/icon/icon';
+import './@material/web/segmentedbuttonset/outlined-segmented-button-set';
+import './@material/web/segmentedbutton/outlined-segmented-button';
+import './@material/web/switch/switch';
 import {classMap} from "lit/directives/class-map.js";
 
 @customElement('main-app')
@@ -112,12 +115,19 @@ export class MainApp extends LitElement {
     @state()
     currentRouteName: string | null = null;
 
+    @state()
+    visibleSection: string = 'both';
+
     private getService():any {
         if(this.currentRegState && this.currentRegState.services && this.currentRegState.services.length > 0) {
             return this.currentRegState.services[0];
         } else {
             return { routes: []};
         }
+    }
+
+    private toggleNav(section:string){
+        this.visibleSection = section;
     }
 
     private async syncToKong() {
@@ -195,6 +205,11 @@ export class MainApp extends LitElement {
 
     render(){
         return html`
+            <md-outlined-segmented-button-set style="z-index:1000;width:100px;position:absolute;bottom:10px;left:20px;background-color: white;">
+                <md-outlined-segmented-button @click=${()=>this.toggleNav('left')} style="background-color: white;" label="Left"></md-outlined-segmented-button>
+                <md-outlined-segmented-button @click=${()=>this.toggleNav('right')} style="background-color: white;" label="Right"></md-outlined-segmented-button>
+                <md-outlined-segmented-button @click=${()=>this.toggleNav('both')} style="background-color: white;" label="Both"></md-outlined-segmented-button>
+            </md-outlined-segmented-button-set>
             <dialog id="favDialog" @close=${this.importOpenAPISpec} ?open=${this.isImportModalVisible}>
                 <form method="dialog">
                     <div>
@@ -218,7 +233,7 @@ paths:
             </dialog>
             <div class="main-layout">
                 <config-form id="configForm" style="width:500px;flex:1;position: relative" @change="${this._handleConfigChange}" formConfiguration=${this.currentFormConfiguration} ></config-form>
-                <div class="pageLayout">
+                <div class="pageLayout" >
                     <div class="leftNav">
                         <md-list>
                         <md-list-item class="${classMap({'link':true, 'selectedNav': this.contextType === 'service'})}" @click=${this.setServiceContext} headline="Service"></md-list-item>

@@ -5,8 +5,8 @@ _info:
   - svc-abc
 services:
 - connect_timeout: 60000
-  enabled: true
-  host: test.org
+  enabled: false
+  host: test2.org
   name: abc
   path: /anything
   plugins:

@@ -6,6 +6,14 @@ import styles  from './regEditor.scss';
 import {html as staticHtml} from 'lit/static-html.js';
 import {observer} from "./@material/web/compat/base/observer";
 
+interface FieldSettings {
+    value: any;
+    required: boolean;
+    display: boolean;
+    priority: number;
+    field: any;
+}
+
 
 // @ts-ignore
 @customElement('reg-form')
@@ -33,6 +41,8 @@ export class RegForm extends LitElement {
 
     @property( { type: Object})
     savedSettings: any = { services : [{ plugins: [], routes: []}]};
+
+    private fieldRuntimeProps : Map<number, FieldSettings> = new Map<number, FieldSettings>();
 
     protected renderMenuSurface(sTag:string): TemplateResult {
         return staticHtml`<${sTag}
@@ -68,10 +78,20 @@ export class RegForm extends LitElement {
         const type = field.dataType === 'number'?  'number':'text';
         return html`
             <div class="textfield">
-            <md-outlined-text-field @input=${(evt:any) => this._handleTextInput(evt, field)} type=${type} .value=${value}/>
+            <md-outlined-text-field ?required=${!!field.required} @input=${(evt:any) => this._handleTextInput(evt, field)} type=${type} .value=${value}/>
             </div>
         `;
     }
+
+    renderSwitch(field:any, value:string):TemplateResult {
+        return html`
+            <div class="textfield">
+            <md-switch @action=${(evt:any) => this._switchHandler(evt, field)} ?checked=${value}/>
+            </div>
+        `;
+    }
+
+
 
     private _handleFieldUpdate(field:any,  value:any,  action = 'set'){
         const prop = field.property;
@@ -130,6 +150,15 @@ export class RegForm extends LitElement {
         this._handleFieldUpdate(field, ref.value, action);
     }
 
+    private async _switchHandler(e: Event, field: any) {
+        e.preventDefault();
+        e.stopPropagation();
+        const ref: any = e.currentTarget;
+        console.log(ref.outerHTML);
+        const value = !!ref.selected;
+        this._handleFieldUpdate(field, value);
+    }
+
     private _handleTextInput(e: Event, field:any) {
         const ref: any = e.currentTarget;
         console.log(ref.outerHTML);
@@ -162,32 +191,44 @@ export class RegForm extends LitElement {
     }
 
     private getPropertyValue(dataContext:any, field:any, defaultValue:any){
-        let val:any = defaultValue;
+        let val:any;
         if(typeof field.property === 'object'){
             const fn = new Function('field', field.property.in);
             val = fn.call(dataContext, field);
         } else {
             val = field.plugin ?  dataContext.config[field.property] : dataContext[field.property];
         }
-        return val || defaultValue;
+        if(typeof(val) !== 'undefined'){
+            return val;
+        } else if(typeof(field.default) !== 'undefined'){
+            return field.default;
+        } else {
+            return defaultValue;
+        }
     }
 
     renderField(field:any):TemplateResult {
         let fieldDef: TemplateResult = html``;
         // get field value;
-        const defaults:any = {'array':[], 'string':'', 'number':0};
-        const dataContext:any = this.getDataRoot();
+        // const defaults:any = {'array':[], 'string':'', 'number':0};
+        // const dataContext:any = this.getDataRoot();
 
-        let fieldValue:any =  defaults[field.dataType];
-
-        if(field.plugin){
-            const pluginData:any = dataContext.plugins.find((ref:any) => ref.name === field.plugin);
-            if(pluginData && pluginData.config){
-                fieldValue = this.getPropertyValue(pluginData, field, fieldValue);
-            }
-        } else {
-            fieldValue = this.getPropertyValue(dataContext, field, fieldValue);
+        const fieldProps = this.fieldRuntimeProps.get(field.name)!;
+        const fieldValue: any = fieldProps.value;
+        if(!fieldProps.display){
+            return html``;
         }
+        // let fieldValue:any =  defaults[field.dataType];
+        //
+        // if(field.plugin){
+        //     const pluginData:any = dataContext.plugins.find((ref:any) => ref.name === field.plugin);
+        //     if(pluginData && pluginData.config){
+        //         fieldValue = this.getPropertyValue(pluginData, field, fieldValue);
+        //     }
+        // } else {
+        //     fieldValue = this.getPropertyValue(dataContext, field, fieldValue);
+        // }
+
         switch(field.type){
             case 'checkbox':
                 fieldDef = this.renderCheckboxGroup(field, fieldValue);
@@ -195,8 +236,11 @@ export class RegForm extends LitElement {
             case 'textfield':
                 fieldDef = this.renderTextField(field, fieldValue);
                 break;
+            case 'switch':
+                fieldDef = this.renderSwitch(field, fieldValue);
+                break;
         }
-        if(field.type === 'checkbox' || field.type==='textfield') {
+        if(field.type === 'checkbox' || field.type === 'textfield' || field.type === 'switch') {
             return html`
                 ${this.renderLabel(field)}
                 ${fieldDef}
@@ -223,23 +267,114 @@ export class RegForm extends LitElement {
 
     renderContainer(refContainer:any):TemplateResult{
         const items = refContainer.items || [];
-        if(!!refContainer.containerRenderer){
-            const fn = new Function('items', 'html', refContainer.containerRenderer);
-            return html`${fn.call(this, items, html)}`;
+        let display = true;
+        if(typeof refContainer.display === "boolean"){
+            display = refContainer.display;
+        } else if(typeof refContainer.display === 'string'){
+            const fn = new Function('fieldIndex', refContainer.display);
+            display = fn.call(refContainer, this.fieldRuntimeProps);
+        }
+        if(display) {
+            if (!!refContainer.containerRenderer) {
+                const fn = new Function('items', 'html', refContainer.containerRenderer);
+                return html`${fn.call(this, items, html)}`;
+            } else {
+                return html`
+                    <div class="container">
+                        ${this.renderSubItems(items)}
+                    </div>
+                `;
+            }
         } else {
-            return html`
-                <div class="container">
-                    ${this.renderSubItems(items)}
-                </div>
-            `;
+            return html``;
+        }
+    }
+
+    /*
+        need to get
+        later may
+     */
+
+
+    private initializeSectionValues(rootContainer: any){
+        // this.fieldRuntimeProps = new Map<number, FieldSettings>();
+        // create
+        let arrFields: FieldSettings[] = this.getFieldList(rootContainer);
+        // need to sort in case of dependent fields
+        arrFields = arrFields.sort((a, b) => (a.priority > b.priority) ? 1 : -1);
+        arrFields.forEach(ref => this.initializeFieldValues(ref));
+    }
+
+    // note - container depth determines field value evaluation priority
+    private getFieldList(refContainer:any, defaultPriorityLevel: number = 0): FieldSettings[]{
+        let items = refContainer.items || [];
+        let arrFields: FieldSettings[] = [];
+        items.forEach((ref:any) => {
+           if(ref.itemRef){
+               ref = this.registrationConfig.itemDefinitions[ref.itemRef];
+           }
+            if(ref.itemType === 'container'){
+                arrFields = arrFields.concat(this.getFieldList(ref, ++defaultPriorityLevel));
+            } else {
+                arrFields.push( {
+                    value: null,
+                    required: false,
+                    display: true,
+                    priority: ref.priority || defaultPriorityLevel,
+                    field: ref
+                });
+            }
+        });
+        return arrFields;
+    }
+
+    private initializeFieldValues(fieldDef:FieldSettings){
+        const defaults:any = {'array':[], 'string':'', 'number':0};
+        const dataContext:any = this.getDataRoot();
+        const field = fieldDef.field;
+        const fieldIndex = this.fieldRuntimeProps;
+        let fieldValue:any =  defaults[field.dataType];
+
+        // TODO - cache dynamic functions in fieldIndex  requireFunction, displayFunction, valueFunction
+        // TODO - this should only be done on first load
+        // Add field to global index
+        fieldIndex.set(field.name, fieldDef);
+
+        // Set Field Value
+        if(field.plugin){
+            const pluginData:any = dataContext.plugins.find((ref:any) => ref.name === field.plugin);
+            if(pluginData && pluginData.config){
+                fieldDef.value = this.getPropertyValue(pluginData, field, fieldValue);
+            }
+        } else {
+            fieldDef.value = this.getPropertyValue(dataContext, field, fieldValue);
+        }
+
+
+
+        // Set Required property -
+        if(typeof(field.required) === 'boolean'){
+            fieldDef.required = field.required;
+        } else if(typeof(field.required) === 'string'){
+            const fn = new Function('fieldIndex', field.required);
+            fieldDef.required = fn.call(fieldDef, fieldIndex);
+        }
+
+        if(typeof field.display === "boolean"){
+            fieldDef.display = field.display;
+        } else if(typeof  field.display === 'string'){
+            const fn = new Function('fieldIndex', field.display);
+            fieldDef.display = fn.call(fieldDef, fieldIndex);
         }
     }
 
     render(){
         const currentSection = this.registrationConfig.sections.find((ref:any) => ref.name === this.section) || { items:[] };
+
+        this.initializeSectionValues(currentSection);
         return html`
             <div class="grid-container">
-                ${this.renderContainer(currentSection || { items :[]})}
+                ${this.renderContainer(currentSection)}
             </div>
         `;
     }
