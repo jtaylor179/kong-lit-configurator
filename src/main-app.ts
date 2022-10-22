@@ -59,10 +59,16 @@ export class MainApp extends LitElement {
         flex:1;
       }
       .pageLayout {
-        display:flex;
-        width:1000px;
-        padding:0px;
+        display: flex;
+        width: 800px;
+        padding: 0px;
+        overflow: scroll;
       }
+      .pageLayout.flex {
+        flex:1;
+        width:unset;
+      }
+      
       .leftNav {
         width:170px;
         padding-top:100px;
@@ -94,6 +100,30 @@ export class MainApp extends LitElement {
         --md-tonal-button-hover-container-elevation-shadow: none;
       
       }
+      .hidden {
+        display:none;
+      }
+      
+      
+      md-outlined-segmented-button {
+        background-color:white;
+      }
+      .configForm {
+       flex:1;position: relative;
+        min-width: 600px;
+      }
+      .configForm.setWidth {
+        width:800px;
+        flex:unset;
+      }
+      .deckOutput {
+        flex:1;
+        min-width: 500px;
+      }
+      .deckOutput.setWidth {
+        width:800px;
+        flex:unset;
+      }
     `;
 
     @query('#favDialog') importOpenAPIModal!: HTMLElement;
@@ -117,6 +147,14 @@ export class MainApp extends LitElement {
 
     @state()
     visibleSection: string = 'both';
+
+    private get configHidden():boolean {
+        return this.visibleSection === 'left';
+    }
+
+    private get deckOutputHidden():boolean{
+        return this.visibleSection === 'right';
+    }
 
     private getService():any {
         if(this.currentRegState && this.currentRegState.services && this.currentRegState.services.length > 0) {
@@ -206,9 +244,9 @@ export class MainApp extends LitElement {
     render(){
         return html`
             <md-outlined-segmented-button-set style="z-index:1000;width:100px;position:absolute;bottom:10px;left:20px;background-color: white;">
-                <md-outlined-segmented-button @click=${()=>this.toggleNav('left')} style="background-color: white;" label="Left"></md-outlined-segmented-button>
-                <md-outlined-segmented-button @click=${()=>this.toggleNav('right')} style="background-color: white;" label="Right"></md-outlined-segmented-button>
-                <md-outlined-segmented-button @click=${()=>this.toggleNav('both')} style="background-color: white;" label="Both"></md-outlined-segmented-button>
+                <md-outlined-segmented-button @click=${()=>this.toggleNav('right')} label="Left"></md-outlined-segmented-button>
+                <md-outlined-segmented-button selected @click=${()=>this.toggleNav('both')}  label="Both"></md-outlined-segmented-button>
+                <md-outlined-segmented-button @click=${()=>this.toggleNav('left')}  label="Right"></md-outlined-segmented-button>
             </md-outlined-segmented-button-set>
             <dialog id="favDialog" @close=${this.importOpenAPISpec} ?open=${this.isImportModalVisible}>
                 <form method="dialog">
@@ -232,8 +270,8 @@ paths:
                 </form>
             </dialog>
             <div class="main-layout">
-                <config-form id="configForm" style="width:500px;flex:1;position: relative" @change="${this._handleConfigChange}" formConfiguration=${this.currentFormConfiguration} ></config-form>
-                <div class="pageLayout" >
+                <config-form id="configForm" class="${classMap({configForm:true, hidden:this.configHidden, setWidth:(this.visibleSection !== 'both')})}"  @change="${this._handleConfigChange}" formConfiguration=${this.currentFormConfiguration} ></config-form>
+                <div class="${classMap({pageLayout:true, flex:(this.visibleSection !== 'both')})}"  >
                     <div class="leftNav">
                         <md-list>
                         <md-list-item class="${classMap({'link':true, 'selectedNav': this.contextType === 'service'})}" @click=${this.setServiceContext} headline="Service"></md-list-item>
@@ -259,7 +297,7 @@ paths:
                         <reg-form id="regForm" routeName=${this.currentRouteName} .savedSettings=${this.currentRegState} .registrationConfig=${this.registrationConfig} contextType=${this.contextType} section=${this.currentRegistrationSection} @change="${this._handleFormInput}"></reg-form>
                     </div>
                 </div>
-                <code-editor id="codeEditor" style="flex:1"   code=${this.currentDeckRegistration} language="yaml">
+                <code-editor id="deckOutput" class="${classMap({deckOutput:true, hidden:this.deckOutputHidden, setWidth:(this.visibleSection !== 'both')})}"    code=${this.currentDeckRegistration} language="yaml">
                 </code-editor>
                 </code-editor>
             </div>

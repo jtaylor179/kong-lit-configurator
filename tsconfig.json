@@ -17,7 +17,8 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "skipLibCheck": true,
-    "importHelpers": true
+    "importHelpers": true,
+    "target": "es5"
   },
   "typeRoots": ["node_modules/@types"],
   "include": ["src/**/*.ts"

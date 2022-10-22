@@ -5,8 +5,8 @@ _info:
   - svc-abc
 services:
 - connect_timeout: 60000
-  enabled: false
-  host: test2.org
+  enabled: true
+  host: test.org
   name: abc
   path: /anything
   plugins:
@@ -19,7 +19,6 @@ services:
       - POST
       - GET
       - PUT
-      - DELETE
       origins: null
       preflight_continue: false
     enabled: true

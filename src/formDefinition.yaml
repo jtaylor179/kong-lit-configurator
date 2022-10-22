@@ -39,6 +39,11 @@ registrationConfig:
             } else {
               return '';
             }
+        validators:
+        - name: 'isUrl'
+          message: 'invalid url'
+        - name: 'validateUpstreamUrl'
+          async: true
     - itemRef: corsEnabledField
     - itemType: container
       display: 'return fieldIndex.get("cors-enabled") ?
@@ -142,3 +147,20 @@ registrationConfig:
       - POST
       - PUT
       - DELETE
+
+#  TODO: Implememt Validation Framework
+#  validators: [
+#            {
+#                name: 'customAsyncValidator',
+#                fnValidate: this.customAsyncValidation,
+#                async: true
+#            }
+#           {name: 'checkboxIsChecked'}
+#      {name: 'notEmpty', message: 'Password is required'}
+#                     {   name: 'customValidator',
+#                        fnValidate: this.customValidation
+#                    }
+#        ]
+#           messages: [
+#                        {name: 'stateCheckmessage', fnCheckMessage: this.checkForStateMessage}
+#                    ]
