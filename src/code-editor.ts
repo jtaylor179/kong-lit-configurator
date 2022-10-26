@@ -141,6 +141,7 @@ export class CodeEditor extends LitElement {
       theme: this.getTheme(),
       automaticLayout: true,
       readOnly: this.readOnly ?? false,
+      minimap: { enabled: false },
     });
     this.editor.getModel()!.onDidChangeContent(() => {
       this.dispatchEvent(new CustomEvent("change", {bubbles: true, composed:true, detail: { value: this.getValue()} }));

@@ -280,9 +280,10 @@ export class RegForm extends LitElement {
                 return html`${fn.call(this, items, html)}`;
             } else {
                 return html`
-                    <div class="container">
+                    <form class="container">
                         ${this.renderSubItems(items)}
-                    </div>
+                        <button type="submit">Submit</button>
+                    </form>
                 `;
             }
         } else {

@@ -60,7 +60,7 @@ export class MainApp extends LitElement {
       }
       .pageLayout {
         display: flex;
-        width: 800px;
+        width: 900px;
         padding: 0px;
         overflow: scroll;
       }
