@@ -287,7 +287,6 @@ export class RegForm extends LitElement {
                 return html`
                     <form class="container">
                         ${this.renderSubItems(items)}
-                        <button type="submit">Submit</button>
                     </form>
                 `;
             }
