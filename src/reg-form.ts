@@ -169,7 +169,12 @@ export class RegForm extends LitElement {
             actionType = 'replace';
             value = ref.value.split(',');
         }
-        this._handleFieldUpdate(field, value, actionType);
+        const isValid = ref.checkValidity();
+        if(isValid) {
+            this._handleFieldUpdate(field, value, actionType);
+        } else {
+            ref.reportValidity();
+        }
     }
 
     private getDataRoot(){
