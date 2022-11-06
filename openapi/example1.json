@@ -1,0 +1,1525 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "QPharma.ModernIntegration.Api",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/orders/shipment": {
+      "post": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Create shipment",
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Shipment created successfully.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateOrderResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateOrderResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateOrderResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Please check response detail."
+          },
+          "500": {
+            "description": "Internal server error. Please check log."
+          }
+        }
+      }
+    },
+    "/api/orders/shipments": {
+      "post": {
+        "tags": [
+          "Order"
+        ],
+        "summary": "Create shipments",
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateOrderRequest"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateOrderRequest"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateOrderRequest"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateOrderRequest"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Shipments created successfully.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateOrderResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateOrderResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateOrderResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Please check response detail."
+          },
+          "500": {
+            "description": "Internal server error. Please check log."
+          }
+        }
+      }
+    },
+    "/api/products": {
+      "post": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Create/update product master and planners records.",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "header",
+            "description": "Unique client identifier. Accepts max five characters for client ID.\r\n            <example>E.g. GSKUS, GSKCA, etc.</example>",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Request model to accept product planner request from consumer for the API.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateProductPlannerRequest"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateProductPlannerRequest"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateProductPlannerRequest"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateProductPlannerRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Products and planners record(s) added successfully.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateProductPlannerResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateProductPlannerResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateProductPlannerResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Please check response detail."
+          },
+          "500": {
+            "description": "Internal server error. Please check log."
+          }
+        }
+      }
+    },
+    "/api/products/unrestricted": {
+      "post": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Create/update unrestricted product records.\r\nIt will perform an upsert. If the record already exists will update. Else, insert a record.",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "header",
+            "description": "Unique client identifier. Accepts max five characters for client ID.\r\n            <example>E.g. GSKUS, GSKCA, etc.</example>",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Request model to accept specialty exclusion request from consumer for the API.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateUnrestrictedProductRequest"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateUnrestrictedProductRequest"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateUnrestrictedProductRequest"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateUnrestrictedProductRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "UnrestrictedProduct product record(s) added successfully.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateUnrestrictedProductResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateUnrestrictedProductResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateUnrestrictedProductResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Please check response detail."
+          },
+          "500": {
+            "description": "Internal server error. Please check log."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Delete unrestricted product record(s) for the given client ID and product NDC number.",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DeleteUnrestrictedProductRequest"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DeleteUnrestrictedProductRequest"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DeleteUnrestrictedProductRequest"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DeleteUnrestrictedProductRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "UnrestrictedProduct product record(s) deleted successfully.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DeleteUnrestrictedProductResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DeleteUnrestrictedProductResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DeleteUnrestrictedProductResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Please check response detail."
+          },
+          "500": {
+            "description": "Internal server error. Please check log."
+          }
+        }
+      }
+    },
+    "/api/products/specialtyexclusion": {
+      "post": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Create/update specialty exclusion records.\r\nIt will perform an upsert. If the record already exists will update. Else, insert a record.",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "header",
+            "description": "Unique client identifier. Accepts max five characters for client ID.\r\n            <example>E.g. GSKUS, GSKCA, etc.</example>",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Request model to accept specialty exclusion request from consumer for the API.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateSpecialtyExclusionRequest"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateSpecialtyExclusionRequest"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateSpecialtyExclusionRequest"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateSpecialtyExclusionRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Specialty exclusion record(s) added successfully.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateSpecialtyExclusionResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateSpecialtyExclusionResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateSpecialtyExclusionResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Please check response detail."
+          },
+          "500": {
+            "description": "Internal server error. Please check log."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Delete specialty exclusion record(s) for the given client ID and product NDC number.",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DeleteSpecialtyExclusionRequest"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DeleteSpecialtyExclusionRequest"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DeleteSpecialtyExclusionRequest"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DeleteSpecialtyExclusionRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Specialty exclusion record(s) deleted successfully.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DeleteSpecialtyExclusionResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DeleteSpecialtyExclusionResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DeleteSpecialtyExclusionResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Please check response detail."
+          },
+          "500": {
+            "description": "Internal server error. Please check log."
+          }
+        }
+      }
+    },
+    "/api/products/inventory": {
+      "post": {
+        "tags": [
+          "Product"
+        ],
+        "summary": "Create inventories",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "header",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Create innventory request",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateInventoryRequest"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateInventoryRequest"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateInventoryRequest"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateInventoryRequest"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Inventories created successfully.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateInventoryResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateInventoryResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateInventoryResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Please check response detail."
+          },
+          "500": {
+            "description": "Internal server error. Please check log."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateInventoryRequest": {
+        "required": [
+          "lotAvailableQuantity",
+          "lotNumber",
+          "packedInQuantity",
+          "productNdcNumber",
+          "productNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "productNumber": {
+            "maxLength": 11,
+            "type": "string",
+            "description": "Product number to identify product.",
+            "example": "0173085961"
+          },
+          "productNdcNumber": {
+            "maxLength": 11,
+            "type": "string",
+            "description": "Product NDC number to identify product.",
+            "example": "01730859610"
+          },
+          "lotNumber": {
+            "maxLength": 30,
+            "type": "string",
+            "description": "Lot number, inventory is being provided at the lot level.",
+            "example": "R783003"
+          },
+          "picklistCode": {
+            "maxLength": 1,
+            "type": "string",
+            "description": "Pick list code.",
+            "nullable": true,
+            "example": "0"
+          },
+          "packedInQuantity": {
+            "type": "integer",
+            "description": "Packaged in quantity is required to validate against entered quantity while an order is placed.",
+            "format": "int32",
+            "example": 48
+          },
+          "lotAvailableQuantity": {
+            "type": "integer",
+            "description": "This is the available inventory.",
+            "format": "int32",
+            "example": 48
+          },
+          "currentPalletSpace": {
+            "type": "integer",
+            "description": "Current pallet space.",
+            "format": "int32",
+            "example": 0
+          },
+          "lotExpirationDate": {
+            "type": "string",
+            "description": "Product lot expiration date. Valid Format e.g. MM/dd/yyyy",
+            "format": "date-time",
+            "nullable": true,
+            "example": "04/03/2022"
+          },
+          "lotShortDate": {
+            "type": "string",
+            "description": "Product lot short date. Valid Format e.g. MM/dd/yyyy",
+            "format": "date-time",
+            "nullable": true,
+            "example": "09/30/2022"
+          },
+          "countryCode": {
+            "maxLength": 3,
+            "pattern": "^(US|USA|CA)$",
+            "type": "string",
+            "description": "Product country code.",
+            "nullable": true,
+            "example": "US"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Product inventory request model to accept product inventory detail from client."
+      },
+      "CreateInventoryResponse": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean",
+            "description": "Is success"
+          },
+          "messageId": {
+            "type": "string",
+            "description": "AWS SQS message id, Only available if IsSuccess is true.",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Message",
+            "nullable": true
+          },
+          "inventory": {
+            "$ref": "#/components/schemas/InventoryResponse"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Inventory response model"
+      },
+      "CreateOrderRequest": {
+        "required": [
+          "clientId",
+          "facilityAddressLine1",
+          "facilityCity",
+          "facilityState",
+          "facilityZip",
+          "orderStatusCode",
+          "requestExternalTransactionId",
+          "shipToFullName"
+        ],
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "description": "Client identifier. It will hold five-digit client ID.",
+            "example": "GSKUS/GSKCA"
+          },
+          "countryCode": {
+            "maxLength": 3,
+            "pattern": "^(US|USA|CA)$",
+            "type": "string",
+            "description": "Product country code.",
+            "nullable": true,
+            "example": "US"
+          },
+          "externalTransactionId": {
+            "maxLength": 40,
+            "type": "string",
+            "description": "External transaction Id.",
+            "nullable": true,
+            "example": "244568374"
+          },
+          "requestExternalTransactionId": {
+            "maxLength": 40,
+            "type": "string",
+            "description": "Request External transaction Id.",
+            "example": "690328"
+          },
+          "orderStatusCode": {
+            "type": "string",
+            "description": "Order current status.",
+            "example": "35"
+          },
+          "transactionTypeCode": {
+            "type": "integer",
+            "description": "Transaction type code.",
+            "format": "int32",
+            "example": 0
+          },
+          "shipToFullName": {
+            "maxLength": 60,
+            "type": "string",
+            "description": "Order shipping to full name.",
+            "example": "MICHELE DOTSON"
+          },
+          "facilityAddressLine1": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Order shipping to address line1.",
+            "example": "8710 CARRINGTON LAKES RIDGE"
+          },
+          "facilityAddressLine2": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Order shipping to address line2.",
+            "nullable": true,
+            "example": "4689 PONCE DE LEON BLVD STE 200"
+          },
+          "facilityCity": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Order shipping to city name.",
+            "example": "TRUSSVILLE"
+          },
+          "facilityState": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Order shipping to state.",
+            "example": "AL"
+          },
+          "facilityZip": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Order shipping facility zip.",
+            "example": "35173"
+          },
+          "externalEmployeeNumber": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "External employee number.",
+            "nullable": true,
+            "example": ""
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Product"
+            },
+            "description": "Order products detail.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Order Status request model to accept order status detail from client"
+      },
+      "CreateOrderResponse": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean",
+            "description": "Is success"
+          },
+          "messageId": {
+            "type": "string",
+            "description": "AWS SQS message id, Only available if IsSuccess is true.",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Message",
+            "nullable": true
+          },
+          "order": {
+            "$ref": "#/components/schemas/OrderResponse"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Order response model"
+      },
+      "CreateProductPlannerRequest": {
+        "required": [
+          "productBrand",
+          "productNdcNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "productNdcNumber": {
+            "maxLength": 11,
+            "type": "string",
+            "description": "Product national drug code (NDC) number to uniquely identify product.\r\nIt can be the ten digit NDC for GSK US products and five digit product number for GSK CA products.",
+            "example": "1730859610"
+          },
+          "productBrand": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Product brand is derived from the product description for all Rx items. \r\nThe first name of product description is used as the brand for Rx items."
+          },
+          "productName": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Optional. If not provided will populate using the product description.",
+            "nullable": true
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductRequest"
+          },
+          "planner": {
+            "$ref": "#/components/schemas/PlannerRequest"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request model to accept product planner request from consumer for the API."
+      },
+      "CreateProductPlannerResponse": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean"
+          },
+          "messageId": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "productPlanner": {
+            "$ref": "#/components/schemas/ProductPlannerResponse"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Response model to return product planner add/update confirmation with AWS SQS message detail to the API consumer."
+      },
+      "CreateSpecialtyExclusionRequest": {
+        "required": [
+          "productNdcNumber",
+          "specialtyGroup"
+        ],
+        "type": "object",
+        "properties": {
+          "specialtyGroup": {
+            "maxLength": 3,
+            "type": "string",
+            "description": "Health care professionals group for which given product is excluded to place an order.",
+            "example": "CHN, CPP, PDS, PED, etc."
+          },
+          "productNdcNumber": {
+            "maxLength": 11,
+            "type": "string",
+            "description": "Product national drug code (NDC) number to uniquely identify product.",
+            "example": "01730859610"
+          },
+          "exclusionDate": {
+            "type": "string",
+            "description": "Optional. If not passed, the exclusion date will be the current date.",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request model to accept specialty exclusion request from consumer for the API."
+      },
+      "CreateSpecialtyExclusionResponse": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean"
+          },
+          "messageId": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "specialtyExclusion": {
+            "$ref": "#/components/schemas/SpecialtyExclusionResponse"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Response model to return specialty exclusion addition/update confirmation with AWS SQS message id and message to the API consumer."
+      },
+      "CreateUnrestrictedProductRequest": {
+        "required": [
+          "productNdcNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "productNdcNumber": {
+            "maxLength": 11,
+            "type": "string",
+            "description": "Product national drug code (NDC) number to uniquely identify product.",
+            "example": "01730859610"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request model to accept unrestricted produt request from consumer for the API."
+      },
+      "CreateUnrestrictedProductResponse": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean"
+          },
+          "messageId": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "unrestrictedProduct": {
+            "$ref": "#/components/schemas/UnrestrictedProductResponse"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Response model to return unrestricted product add/update confirmation with AWS SQS message detail to the API consumer."
+      },
+      "DeleteSpecialtyExclusionRequest": {
+        "required": [
+          "productNdcNumber",
+          "specialtyGroup"
+        ],
+        "type": "object",
+        "properties": {
+          "specialtyGroup": {
+            "maxLength": 3,
+            "type": "string",
+            "description": "Health care professionals group for which given product is excluded to place an order.",
+            "example": "CHN, CPP, PDS, PED, etc."
+          },
+          "productNdcNumber": {
+            "maxLength": 11,
+            "type": "string",
+            "description": "Product national drug code (NDC) number to uniquely identify product.",
+            "example": "01730859610"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request model to accept specialty exclusion delete request from consumer for the API."
+      },
+      "DeleteSpecialtyExclusionResponse": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean"
+          },
+          "messageId": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "specialtyExclusion": {
+            "$ref": "#/components/schemas/SpecialtyExclusionResponse"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Response model to return specialty exclusion addition/update confirmation with AWS SQS message id and message to the API consumer."
+      },
+      "DeleteUnrestrictedProductRequest": {
+        "required": [
+          "productNdcNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "productNdcNumber": {
+            "maxLength": 11,
+            "type": "string",
+            "description": "Product national drug code (NDC) number to uniquely identify product.",
+            "example": "01730859610"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Request model to accept unrestricted product delete request from consumer for the API."
+      },
+      "DeleteUnrestrictedProductResponse": {
+        "type": "object",
+        "properties": {
+          "isSuccess": {
+            "type": "boolean"
+          },
+          "messageId": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "unrestrictedProduct": {
+            "$ref": "#/components/schemas/UnrestrictedProductResponse"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Response model to return specialty exclusion addition/update confirmation with AWS SQS message id and message to the API consumer."
+      },
+      "InventoryResponse": {
+        "type": "object",
+        "properties": {
+          "productNumber": {
+            "type": "string",
+            "description": "Product number to identify product",
+            "nullable": true
+          },
+          "productNdcNumber": {
+            "type": "string",
+            "description": "Product NDC number to identify product",
+            "nullable": true
+          },
+          "lotNumber": {
+            "type": "string",
+            "description": "Lot number, inventory is being provided at the lot level.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Inventory Response"
+      },
+      "OrderResponse": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "nullable": true
+          },
+          "requestExternalTransactionId": {
+            "type": "string",
+            "description": "Request external TransactionId to identify order",
+            "nullable": true
+          },
+          "externalTransactionId": {
+            "type": "string",
+            "description": "External Transaction Id is being provided with order.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Order Payload info"
+      },
+      "PlannerRequest": {
+        "required": [
+          "ceaseUseDate",
+          "countryCode",
+          "cssDistFlag",
+          "parNo",
+          "reviewDate"
+        ],
+        "type": "object",
+        "properties": {
+          "parNo": {
+            "maxLength": 18,
+            "type": "string",
+            "description": "PAR number is used to identify the product.\r\nThis value is applicable to the promotional items for GSKCA only."
+          },
+          "cssDistFlag": {
+            "maxLength": 1,
+            "type": "string",
+            "description": "CSS dst flag, used to identify if a project was released for Use."
+          },
+          "reviewDate": {
+            "type": "string",
+            "description": "Review date",
+            "format": "date-time"
+          },
+          "ceaseUseDate": {
+            "type": "string",
+            "description": "Cease use date",
+            "format": "date-time"
+          },
+          "countryCode": {
+            "maxLength": 2,
+            "type": "string",
+            "description": "Country code, e.g., US/CA"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Contains planner information"
+      },
+      "PlannerResponse": {
+        "type": "object",
+        "properties": {
+          "parNo": {
+            "type": "string",
+            "description": "PAR number is used to identify the project.\r\nThis value is applicable to the promotional items for GSKCA only.",
+            "nullable": true
+          },
+          "cssDistFlag": {
+            "type": "string",
+            "description": "CSS dst flag, used to identify if a project was released for Use.",
+            "nullable": true
+          },
+          "reviewDate": {
+            "type": "string",
+            "description": "Review date",
+            "format": "date-time"
+          },
+          "ceaseUseDate": {
+            "type": "string",
+            "description": "Cease use date",
+            "format": "date-time"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Country code, e.g., US/CA",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Planner response"
+      },
+      "Product": {
+        "required": [
+          "productId",
+          "quantity"
+        ],
+        "type": "object",
+        "properties": {
+          "transactionDate": {
+            "type": "string",
+            "description": "Order transaction date. Valid Format e.g. MM/dd/yyyy",
+            "format": "date-time",
+            "nullable": true,
+            "example": "02/20/2018"
+          },
+          "shipmentTrackingNumber": {
+            "maxLength": 30,
+            "type": "string",
+            "description": "Order shipment tracking number.",
+            "nullable": true,
+            "example": "1ZV145570345801987"
+          },
+          "packingSlipNumber": {
+            "maxLength": 40,
+            "type": "string",
+            "description": "Order packing slip number.",
+            "nullable": true,
+            "example": "2087987749"
+          },
+          "carrier": {
+            "maxLength": 25,
+            "type": "string",
+            "description": "Order shipping carrier.",
+            "nullable": true,
+            "example": "UPS"
+          },
+          "productId": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Product ID to identify product.",
+            "example": "01738284427"
+          },
+          "lotNumber": {
+            "maxLength": 40,
+            "type": "string",
+            "description": "Lot number, inventory is being provided at the lot level.",
+            "nullable": true,
+            "example": "R0"
+          },
+          "quantity": {
+            "maximum": 2147483647,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Number of items in order.",
+            "format": "int32",
+            "example": 10
+          },
+          "shipmentStatus": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Order shipment status.",
+            "nullable": true,
+            "example": "35"
+          },
+          "shipmentStatusReason": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Order shipment rejected reason.",
+            "nullable": true,
+            "example": ""
+          }
+        },
+        "additionalProperties": false,
+        "description": "Order products detail"
+      },
+      "ProductPlannerResponse": {
+        "type": "object",
+        "properties": {
+          "productNdcNumber": {
+            "type": "string",
+            "description": "Product national drug code (NDC) number to uniquely identify product.\r\nIt can be the ten digit NDC for GSK US products and five digit product number for GSK CA products.",
+            "nullable": true,
+            "example": "1730859610"
+          },
+          "productBrand": {
+            "type": "string",
+            "description": "Product brand is derived from the product description for all Rx items. \r\nThe first name of product description is used as the brand for Rx items.",
+            "nullable": true
+          },
+          "productName": {
+            "type": "string",
+            "description": "Product name",
+            "nullable": true
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductResponse"
+          },
+          "planner": {
+            "$ref": "#/components/schemas/PlannerResponse"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Response model to return specialty exclusion addition/update confirmation to the API consumer."
+      },
+      "ProductRequest": {
+        "required": [
+          "caseQuantity",
+          "countryCode",
+          "productDescription",
+          "productNumber",
+          "productStatus",
+          "productType"
+        ],
+        "type": "object",
+        "properties": {
+          "productNumber": {
+            "maxLength": 11,
+            "type": "string",
+            "description": "Product number to identify product. Sample product number 00001000348.\r\nContain the 11 digit product NDC for GSK US products and unique product ID for GSK CA products."
+          },
+          "productDescription": {
+            "maxLength": 250,
+            "type": "string",
+            "description": "Product description provides the full product description (long name) of the product, etc. Sample product description 1 'AVANDAMET TABS 1MG/500MG 14S'. Use this field for both Sample(Rx) and Promotional items."
+          },
+          "productType": {
+            "maxLength": 3,
+            "type": "string",
+            "description": "Product type to differentiate products. Sample product type SMP.\r\nSMP for samples (Rx)\r\nPRO for promotional items"
+          },
+          "productStatus": {
+            "maxLength": 1,
+            "type": "string",
+            "description": "Product status is required to differentiate current product activation based on cease use date."
+          },
+          "productEffectiveDate": {
+            "type": "string",
+            "description": "Product effective date.",
+            "format": "date-time"
+          },
+          "caseQuantity": {
+            "type": "integer",
+            "description": "Product case quantity.",
+            "format": "int32"
+          },
+          "countryCode": {
+            "maxLength": 2,
+            "type": "string",
+            "description": "Product country code."
+          },
+          "manufacturerName": {
+            "maxLength": 50,
+            "type": "string",
+            "description": "Product manufacturer name.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Contains product information"
+      },
+      "ProductResponse": {
+        "type": "object",
+        "properties": {
+          "productNumber": {
+            "type": "string",
+            "description": "Product number to identify product. Sample product number 7316661.",
+            "nullable": true
+          },
+          "productDescription": {
+            "type": "string",
+            "description": "Product description provides the full product description (long name) of the product, etc. Sample product description 1 'AVANDAMET TABS 1MG/500MG 14S'. Use this field for both Sample(Rx) and Promotional items.",
+            "nullable": true
+          },
+          "productType": {
+            "type": "string",
+            "description": "Product type to differentiate products. Sample product type SMP.",
+            "nullable": true
+          },
+          "productStatus": {
+            "type": "string",
+            "description": "Product status is required to differentiate current product activation based on cease use date.\r\nThis property maps to DI_PRODUCT.PRODUCT_STATUS column.\r\nReference master table MSTR_PROD.PROD_ACTIVE_IND column.",
+            "nullable": true
+          },
+          "productEffectiveDate": {
+            "type": "string",
+            "description": "Product effective date.\r\nThis property maps to DI_PRODUCT.PRODUCT_EFFECTIVE_DATE column.\r\nReference master table MSTR_PROD.PROD_EFFECTIVE_DT column.",
+            "format": "date-time"
+          },
+          "caseQuantity": {
+            "type": "integer",
+            "description": "Product case quantity.\r\nThis property maps to DI_PRODUCT.CASE_QUANTITY column.\r\nReference master table MSTR_PROD.PROD_CASEUNITS column.",
+            "format": "int32"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Product country code.\r\nThis property maps to DI_PRODUCT.COUNTRY_CODE column.\r\nMSTR_PROD table mapping is missing.",
+            "nullable": true
+          },
+          "manufacturerName": {
+            "type": "string",
+            "description": "Product manufacturer name.\r\nThis property maps to DI_PRODUCT.MANUFACTURER_NAME column.\r\nMSTR_PROD table mapping is missing.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Product Result"
+      },
+      "SpecialtyExclusionResponse": {
+        "type": "object",
+        "properties": {
+          "productNdcNumber": {
+            "type": "string",
+            "description": "Product national drug code (NDC) number to uniquely identify product.",
+            "nullable": true
+          },
+          "specialtyGroup": {
+            "type": "string",
+            "description": "Health care professionals group for which given product is excluded to place an order.",
+            "nullable": true
+          },
+          "exclusionDate": {
+            "type": "string",
+            "description": "The date from which specialty exclusion is applicable for given product.",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Response model to return specialty exclusion addition/update confirmation to the API consumer."
+      },
+      "UnrestrictedProductResponse": {
+        "type": "object",
+        "properties": {
+          "productNdcNumber": {
+            "type": "string",
+            "description": "Product national drug code (NDC) number to uniquely identify product.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Response model to return unrestricted product addition/update confirmation to the API consumer."
+      }
+    }
+  }
+}

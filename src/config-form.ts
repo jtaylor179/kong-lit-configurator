@@ -21,7 +21,7 @@ export class ConfigForm extends LitElement {
         if (!!evt.detail.value) {
             const ref = yaml.load(evt.detail.value);
             if(ref) {
-                console.log(JSON.stringify(ref));
+                // console.log(JSON.stringify(ref));
                 this.dispatchEvent(new CustomEvent("change", {bubbles: true, composed: true, detail: {value: ref}}));
             }
         }

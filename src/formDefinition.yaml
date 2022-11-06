@@ -22,6 +22,7 @@ registrationConfig:
         label: Tags
         dataType: array
         property: tags
+        pattern: '[Tt]ag\d+$'
       - itemType: field
         name: upstreamUrl
         type: textfield
@@ -88,7 +89,9 @@ registrationConfig:
       type: switch
       dataType: boolean
       label: CORS Enabled
+      plugin: cors
       default: false
+      triggerRender: true
     nameField:
       itemType: field
       name: name
@@ -105,8 +108,6 @@ registrationConfig:
       property: methods
       type: checkbox
       label: CORS Methods
-      validationType: function
-      validationFunction: function(val, fields){ return true;}
       options:
       - GET
       - POST

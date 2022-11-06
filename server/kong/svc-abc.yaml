@@ -19,6 +19,7 @@ services:
       - POST
       - GET
       - PUT
+      - PATCH
       origins: null
       preflight_continue: false
     enabled: true

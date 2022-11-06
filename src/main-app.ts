@@ -5,7 +5,6 @@ import './config-form';
 import './reg-form';
 import './button-tabs';
 import * as yaml from 'js-yaml'
-import {observer} from "./@material/web/compat/base/observer";
 import {dump} from "js-yaml";
 import './@material/web/button/tonal-button.ts';
 import './@material/web/navigationtab/navigation-tab';
@@ -18,6 +17,8 @@ import './@material/web/segmentedbuttonset/outlined-segmented-button-set';
 import './@material/web/segmentedbutton/outlined-segmented-button';
 import './@material/web/switch/switch';
 import {classMap} from "lit/directives/class-map.js";
+import {RegForm} from "./reg-form";
+import {CodeEditor} from "./code-editor";
 
 @customElement('main-app')
 export class MainApp extends LitElement {
@@ -139,7 +140,6 @@ export class MainApp extends LitElement {
     contextType: string = 'service';
 
 
-    @state()
     currentRegState: any = {};
 
     @state()
@@ -215,16 +215,17 @@ export class MainApp extends LitElement {
             // 'sortKeys': true        // sort object keys
         });
 
-        this.currentDeckRegistration = updateState;
+        this.setCurrentDeckRegistration(updateState);
     }
 
 
-    @state()
-    @observer(function(this: MainApp) {
-        const ref:any  = yaml.load(this.currentDeckRegistration);
-        this.currentRegState = ref;
-    })
-    currentDeckRegistration: string = '_format_version: "3.0"\n';
+    private currentDeckRegistration: string = '_format_version: "3.0"\n';
+    //
+    private setCurrentDeckRegistration(sDeck:string){
+        this.currentDeckRegistration = sDeck;
+        this.currentRegState = yaml.load(sDeck);
+        this.updateDeckOutput();
+    }
 
 
     @state()
@@ -232,6 +233,10 @@ export class MainApp extends LitElement {
 
     @state()
     isImportModalVisible: boolean = false;
+
+    // @query('#regForm')
+    // regForm: RegForm;
+
 
     private navigateSection(evt:any){
         this.currentRegistrationSection = evt.detail.value;
@@ -294,10 +299,10 @@ paths:
                             <button @click=${this.syncToKong} class="linkButton">Sync</button>
                             <button @click=${this.showImport} class="linkButton">Import OpenAPI</button>
                         </div>
-                        <reg-form id="regForm" routeName=${this.currentRouteName} .savedSettings=${this.currentRegState} .registrationConfig=${this.registrationConfig} contextType=${this.contextType} section=${this.currentRegistrationSection} @change="${this._handleFormInput}"></reg-form>
+                        <reg-form id="regForm" routeName=${this.currentRouteName}  contextType=${this.contextType} section=${this.currentRegistrationSection} @change="${this._handleFormInput}"></reg-form>
                     </div>
                 </div>
-                <code-editor id="deckOutput" class="${classMap({deckOutput:true, hidden:this.deckOutputHidden, setWidth:(this.visibleSection !== 'both')})}"    code=${this.currentDeckRegistration} language="yaml">
+                <code-editor id="deckOutput" class="${classMap({deckOutput:true, hidden:this.deckOutputHidden, setWidth:(this.visibleSection !== 'both')})}" language="yaml">
                 </code-editor>
                 </code-editor>
             </div>
@@ -307,30 +312,17 @@ paths:
 
 
     protected async firstUpdated() {
-        // const resp = await fetch('http://localhost:3000/api/formDefinition');
-        // const definition = await resp.text();
-        // const ref  = yaml.load(data);
-        // this.updateRegForm(ref);
-
         const exampleResp = await fetch('http://localhost:3000/api/loadRegistration/svc-abc');
         const currentReg = await exampleResp.text();
-        this.currentDeckRegistration = currentReg;
-
-        // this.updateConfigForm(definition); //
+        this.setCurrentDeckRegistration(currentReg);
 
         const resp = await fetch('http://localhost:3000/api/formDefinition');
         const definition = await resp.text();
         this.currentFormConfiguration = definition;
         const ref:any  = yaml.load(definition);
         this.registrationConfig = ref.registrationConfig || [];
-
+        this.updateRegForm();
     }
-
-    // updateConfigForm(sConfig:string){
-    //     this.registrationConfig = sConfig;
-    //     console.log(sConfig);
-    //
-    // }
 
 
     private _handleFormInput(ref:any){
@@ -340,7 +332,7 @@ paths:
         const currentService: any = this.getService();
         console.log(JSON.stringify(currentService));
 
-        const svcConfig = updateRoot.service;
+        const svcConfig = updateRoot.services[0];
         for(const prop in svcConfig){
             if(prop !== 'plugins') {
                 currentService[prop] = svcConfig[prop];
@@ -368,14 +360,14 @@ paths:
             // 'sortKeys': true        // sort object keys
         });
 
-        this.currentDeckRegistration = updateState;
-
+        this.setCurrentDeckRegistration(updateState);
     }
 
     _handleConfigChange(e:any){
        // this.updateRegForm(e.detail.value);
         const reg = e.detail.value;
         this.registrationConfig = !!reg.registrationConfig && !!reg.registrationConfig.sections ? reg.registrationConfig : { sections:[]};
+        this.updateRegForm();
     }
 
     // updateConfigForm(sUpdate:string){
@@ -385,10 +377,14 @@ paths:
     //     }
     // }
 
-    // updateRegForm(ref:any){
-    //     const regForm:RegForm = this.renderRoot.querySelector('reg-form') as RegForm;
-    //     if(regForm) {
-    //         regForm.formDefinition = ref.registrationConfig;
-    //     }
-    // }
+    updateRegForm(){
+        const regForm:RegForm = this.renderRoot.querySelector('reg-form') as RegForm;
+        regForm.registrationConfig = this.registrationConfig;
+        regForm.savedSettings = this.currentRegState;
+    }
+
+    updateDeckOutput(){
+        const codeEditor:CodeEditor = this.renderRoot.querySelector('#deckOutput') as CodeEditor;
+        codeEditor.code = this.currentDeckRegistration;
+    }
 }

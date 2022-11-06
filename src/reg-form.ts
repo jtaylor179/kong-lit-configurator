@@ -1,10 +1,10 @@
 
-import {CSSResultGroup, html, LitElement, TemplateResult} from "lit";
+import {CSSResultGroup, html, LitElement,  TemplateResult} from "lit";
 import { customElement, property } from "lit/decorators.js";
 import styles  from './regEditor.scss';
 
-import {html as staticHtml} from 'lit/static-html.js';
 import {observer} from "./@material/web/compat/base/observer";
+import {ifDefined} from "lit/directives/if-defined.js";
 
 interface FieldSettings {
     value: any;
@@ -44,23 +44,8 @@ export class RegForm extends LitElement {
 
     private fieldRuntimeProps : Map<number, FieldSettings> = new Map<number, FieldSettings>();
 
-    protected renderMenuSurface(sTag:string): TemplateResult {
-        return staticHtml`<${sTag}
-      class="md3-autocomplete__menu-surface"
-      .corner="BOTTOM_START"
-      ?stayOpenOnBodyClick=${true}
-    >
-      <${sTag} class="md3-autocomplete__list">
-        <slot></slot>
-      </${sTag}>
-    </${sTag}>`;
-    }
+    private _currentSection: any;
 
-    renderFields(fields:any[]):TemplateResult {
-        return html`
-            ${fields.map((ref:any) => this.renderField(ref))}
-        `;
-    }
 
     renderLabel(field:any):TemplateResult{
         return html`<label class="fieldLabel">${field.label}</label>`;
@@ -78,7 +63,7 @@ export class RegForm extends LitElement {
         const type = field.dataType === 'number'?  'number':'text';
         return html`
             <div class="textfield">
-            <md-outlined-text-field ?required=${!!field.required} @input=${(evt:any) => this._handleTextInput(evt, field)} type=${type} .value=${value}/>
+            <md-outlined-text-field pattern=${ifDefined(field.pattern)} ?required=${!!field.required} @input=${(evt:any) => this._handleTextInput(evt, field)} type=${type} .value=${value}/>
             </div>
         `;
     }
@@ -136,7 +121,9 @@ export class RegForm extends LitElement {
                 targetConfig[prop] = value;
             }
         }
-
+        if(field.triggerRender) {
+            this.requestUpdate();
+        }
         this.dispatchEvent(new CustomEvent("change", {bubbles: true, composed:true, detail: { value: this.savedSettings} }));
 
     }
@@ -159,7 +146,7 @@ export class RegForm extends LitElement {
         this._handleFieldUpdate(field, value);
     }
 
-    private _handleTextInput(e: Event, field:any) {
+    private async _handleTextInput(e: Event, field:any) {
         const ref: any = e.currentTarget;
         console.log(ref.outerHTML);
         console.log(field.name);
@@ -172,9 +159,12 @@ export class RegForm extends LitElement {
         const isValid = ref.checkValidity();
         if(isValid) {
             this._handleFieldUpdate(field, value, actionType);
-        } else {
-            ref.reportValidity();
+            await this.updateComplete;
+            // const len = ref.value.length;
+            // setTimeout( function(){ console.log('focus'); ref.focus(); ref.click(); ref.setSelectionRange(len, len); }, 5000);
         }
+        ref.reportValidity();
+
     }
 
     private getDataRoot(){
@@ -223,16 +213,7 @@ export class RegForm extends LitElement {
         if(!fieldProps.display){
             return html``;
         }
-        // let fieldValue:any =  defaults[field.dataType];
-        //
-        // if(field.plugin){
-        //     const pluginData:any = dataContext.plugins.find((ref:any) => ref.name === field.plugin);
-        //     if(pluginData && pluginData.config){
-        //         fieldValue = this.getPropertyValue(pluginData, field, fieldValue);
-        //     }
-        // } else {
-        //     fieldValue = this.getPropertyValue(dataContext, field, fieldValue);
-        // }
+
 
         switch(field.type){
             case 'checkbox':
@@ -373,15 +354,24 @@ export class RegForm extends LitElement {
         }
     }
 
-    render(){
-        const currentSection = this.registrationConfig.sections.find((ref:any) => ref.name === this.section) || { items:[] };
+    willUpdate(){
+        if(this.registrationConfig && this.registrationConfig.sections) {
+            this._currentSection = this.registrationConfig.sections.find((ref: any) => ref.name === this.section) || {items: []};
 
-        this.initializeSectionValues(currentSection);
-        return html`
-            <div class="grid-container">
-                ${this.renderContainer(currentSection)}
-            </div>
-        `;
+            this.initializeSectionValues(this._currentSection);
+        }
+    }
+
+    render(){
+        if(this._currentSection) {
+            return html`
+                <div class="grid-container">
+                    ${this.renderContainer(this._currentSection)}
+                </div>
+            `;
+        } else {
+            return html``;
+        }
     }
 }
 
