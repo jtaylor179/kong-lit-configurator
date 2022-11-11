@@ -161,6 +161,7 @@ export class MainApp extends LitElement {
       .closeServer {
         position: absolute;
         right: 30px;
+        cursor: pointer;
       }
       
       .deckOutput.setWidth {

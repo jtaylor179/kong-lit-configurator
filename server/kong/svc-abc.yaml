@@ -1,78 +1,78 @@
-_format_version: '1.1'
+_format_version: "1.1"
 _info:
   defaults: {}
   select_tags:
-    - svc-abc
+  - svc-abc
 services:
-  - connect_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: test.org
+  name: abc2
+  path: /anything
+  plugins:
+  - config:
+      credentials: false
+      exposed_headers: null
+      headers: null
+      max_age: 1000
+      methods:
+      - PUT
+      - PATCH
+      - DELETE
+      - GET
+      - POST
+      origins: null
+      preflight_continue: false
     enabled: true
-    host: test.org
-    name: abc2
-    path: /anything
+    name: cors
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  port: 80
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - hosts:
+    - abc123
+    https_redirect_status_code: 426
+    methods:
+    - PUT
+    - DELETE
+    - POST
+    name: myfirstroute
+    path_handling: v0
+    paths:
+    - /myfirstroute2
     plugins:
-      - config:
-          credentials: false
-          exposed_headers: null
-          headers: null
-          max_age: 1000
-          methods:
-            - PUT
-            - PATCH
-            - DELETE
-            - GET
-            - POST
-          origins: null
-          preflight_continue: false
-        enabled: true
-        name: cors
-        protocols:
-          - grpc
-          - grpcs
-          - http
-          - https
-    port: 80
-    protocol: https
-    read_timeout: 60000
-    retries: 5
-    routes:
-      - hosts:
-          - abc123
-        https_redirect_status_code: 426
+    - config:
+        credentials: false
+        exposed_headers: null
+        headers: null
+        max_age: null
         methods:
-          - PUT
-          - DELETE
-          - POST
-        name: myfirstroute
-        path_handling: v0
-        paths:
-          - /myfirstroute2
-        plugins:
-          - config:
-              credentials: false
-              exposed_headers: null
-              headers: null
-              max_age: null
-              methods:
-                - DELETE
-                - PUT
-                - POST
-              origins: null
-              preflight_continue: false
-            enabled: true
-            name: cors
-            protocols:
-              - grpc
-              - grpcs
-              - http
-              - https
-        preserve_host: false
-        protocols:
-          - http
-          - https
-        regex_priority: 0
-        request_buffering: true
-        response_buffering: true
-        strip_path: true
-    tags:
-      - svc-abc
-    write_timeout: 60000
+        - DELETE
+        - PUT
+        - POST
+        origins: null
+        preflight_continue: false
+      enabled: true
+      name: cors
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  tags:
+  - svc-abc
+  write_timeout: 60000
