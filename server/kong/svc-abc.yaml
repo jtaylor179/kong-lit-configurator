@@ -7,7 +7,7 @@ services:
 - connect_timeout: 60000
   enabled: true
   host: test.org
-  name: abc
+  name: abc2
   path: /anything
   plugins:
   - config:

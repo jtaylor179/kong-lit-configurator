@@ -28,6 +28,7 @@ export class MainApp extends LitElement {
         height: 100%;
         --md-list-list-item-one-line-container-height: 30px;
         --md-outlined-field-container-height: 20px;
+        font-family: Roboto;
       }
       .link {
         color:blue;
@@ -59,16 +60,36 @@ export class MainApp extends LitElement {
         display: flex;
         flex:1;
       }
-      .pageLayout {
+      .rightPane {
         display: flex;
         width: 900px;
         padding: 0px;
-        overflow: scroll;
+        flex-direction: column;
       }
-      .pageLayout.flex {
+      .rightPane.flex {
         flex:1;
         width:unset;
       }
+
+      .deckPreviewLabel {
+        padding-top:10px;
+        height:30px;
+        border-bottom: 1px outset white;
+        border-right: 1px outset white;
+        text-indent:10px;
+        margin-right:20px;
+        background-color: rgba(156, 179, 179, 0.18);
+      }
+      .previewPane {
+        flex:1;
+        display:flex;
+        overflow:scroll;
+      }
+      .deckViewerPane {
+        height:300px;
+        overflow:scroll;;
+      }
+      
       
       .leftNav {
         width:170px;
@@ -112,6 +133,8 @@ export class MainApp extends LitElement {
       .configForm {
        flex:1;position: relative;
         min-width: 600px;
+        flex-direction: column;
+        display:flex;
       }
       .configForm.setWidth {
         width:800px;
@@ -216,6 +239,7 @@ export class MainApp extends LitElement {
         });
 
         this.setCurrentDeckRegistration(updateState);
+        this.updateRegForm();
     }
 
 
@@ -248,7 +272,7 @@ export class MainApp extends LitElement {
 
     render(){
         return html`
-            <md-outlined-segmented-button-set style="z-index:1000;width:100px;position:absolute;bottom:10px;left:20px;background-color: white;">
+            <md-outlined-segmented-button-set style="display:none;z-index:1000;width:100px;position:absolute;bottom:10px;left:20px;background-color: white;">
                 <md-outlined-segmented-button @click=${()=>this.toggleNav('right')} label="Left"></md-outlined-segmented-button>
                 <md-outlined-segmented-button selected @click=${()=>this.toggleNav('both')}  label="Both"></md-outlined-segmented-button>
                 <md-outlined-segmented-button @click=${()=>this.toggleNav('left')}  label="Right"></md-outlined-segmented-button>
@@ -275,9 +299,14 @@ paths:
                 </form>
             </dialog>
             <div class="main-layout">
-                <config-form id="configForm" class="${classMap({configForm:true, hidden:this.configHidden, setWidth:(this.visibleSection !== 'both')})}"  @change="${this._handleConfigChange}" formConfiguration=${this.currentFormConfiguration} ></config-form>
-                <div class="${classMap({pageLayout:true, flex:(this.visibleSection !== 'both')})}"  >
-                    <div class="leftNav">
+                <div class="${classMap({configForm:true, hidden:this.configHidden, setWidth:(this.visibleSection !== 'both')})}">
+                    <label class="deckPreviewLabel">Form Configuration</label>
+                    <config-form id="configForm"   @change="${this._handleConfigChange}" formConfiguration=${this.currentFormConfiguration} ></config-form>
+                </div>
+                <div class="${classMap({rightPane:true, flex:(this.visibleSection !== 'both')})}"  >
+                    <label class="deckPreviewLabel">Registration Preview</label>
+                    <div class="previewPane">
+                        <div class="leftNav">
                         <md-list>
                         <md-list-item class="${classMap({'link':true, 'selectedNav': this.contextType === 'service'})}" @click=${this.setServiceContext} headline="Service"></md-list-item>
                         <md-list-item headline="Routes" style="--md-ripple-hover-state-layer-color:transparent;">
@@ -285,26 +314,30 @@ paths:
                         </md-list-item>
                         
                         ${this.getRoutes().map((ref:any) => {
-                            return html`<md-list-item class="${classMap({'link':true, 'selectedNav': this.currentRouteName === ref.name})}" headline=${ref.name} @click=${() => this.setActiveRoute(ref.name)}>
+            return html`<md-list-item class="${classMap({'link':true, 'selectedNav': this.currentRouteName === ref.name})}" headline=${ref.name} @click=${() => this.setActiveRoute(ref.name)}>
                                   <span class="routePrefix" slot="start">
-                            <md-icon class="mdc-button__icon">
-                                  alt_route
+                            <md-icon class="mdc-button__icon" style="font-size: 16px;">
+                                  settings
                                 </md-icon>
                             </span></md-list-item>`;
-                        })}
+        })}
                         </md-list>
                     </div>
-                    <div class="mainBody">
-                        <div class="tab-row"><button-tabs style="width:800px" contextType=${this.contextType}  @change=${this.navigateSection} currentTab=${this.currentRegistrationSection} .tabList=${this.registrationConfig.sections}></button-tabs>
-                            <button @click=${this.syncToKong} class="linkButton">Sync</button>
-                            <button @click=${this.showImport} class="linkButton">Import OpenAPI</button>
+                        <div class="mainBody">
+                            <div class="tab-row"><button-tabs style="width:800px" contextType=${this.contextType}  @change=${this.navigateSection} currentTab=${this.currentRegistrationSection} .tabList=${this.registrationConfig.sections}></button-tabs>
+                                <button @click=${this.syncToKong} class="linkButton">Sync</button>
+                                <button @click=${this.showImport} class="linkButton">Import OpenAPI</button>
+                            </div>
+                            <reg-form id="regForm" routeName=${this.currentRouteName}  contextType=${this.contextType} section=${this.currentRegistrationSection} @change="${this._handleFormInput}"></reg-form>
                         </div>
-                        <reg-form id="regForm" routeName=${this.currentRouteName}  contextType=${this.contextType} section=${this.currentRegistrationSection} @change="${this._handleFormInput}"></reg-form>
+                    </div>
+                    <label class="deckPreviewLabel">Deck Output</label>
+                    <div class="deckViewerPane">
+                        <code-editor id="deckOutput" class="${classMap({deckOutput:true, hidden:this.deckOutputHidden, setWidth:(this.visibleSection !== 'both')})}" language="yaml">
+                        </code-editor>
                     </div>
                 </div>
-                <code-editor id="deckOutput" class="${classMap({deckOutput:true, hidden:this.deckOutputHidden, setWidth:(this.visibleSection !== 'both')})}" language="yaml">
-                </code-editor>
-                </code-editor>
+
             </div>
         `;
     }
