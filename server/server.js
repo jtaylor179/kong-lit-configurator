@@ -59,7 +59,7 @@ app.post('/api/runKongSync/:svcname', async function(req, resp){
                 return;
             }
             console.log(`stdout: ${stdout}`);
-            resp.json('{result:"' + stdout + '"}');
+            resp.json({result: stdout});
         });
 
     } catch (err) {

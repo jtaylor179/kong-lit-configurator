@@ -147,6 +147,22 @@ export class MainApp extends LitElement {
         flex:1;
         min-width: 500px;
       }
+      #serverOutput {
+        display:none;
+        flex:1;
+        background-color: black;
+        color:limegreen;
+        height:100%;
+        padding:20px;
+        overflow: scroll;
+        margin-right:20px;
+        
+      }
+      .closeServer {
+        position: absolute;
+        right: 30px;
+      }
+      
       .deckOutput.setWidth {
         width:800px;
         flex:unset;
@@ -155,6 +171,8 @@ export class MainApp extends LitElement {
 
     @query('#favDialog') importOpenAPIModal!: HTMLElement;
     @query('#txtOpenAPI') txtOpenAPISpec!: HTMLTextAreaElement;
+    @query('#serverOutput') serverOutput!: HTMLElement;
+    @query('#deckOutput') deckOutput!: HTMLElement;
 
     @state()
     currentFormConfiguration: string = '#TODO';
@@ -200,9 +218,20 @@ export class MainApp extends LitElement {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({name: this.getService().name, deck: this.currentDeckRegistration})
         };
-        await fetch('http://localhost:3000/api/runKongSync/svc-abc', requestOptions);
+        const resp = await fetch('http://localhost:3000/api/runKongSync/svc-abc', requestOptions);
+
+        const data = await resp.json();
+        this.deckOutput.style.display = 'none';
+        this.serverOutput.style.display = 'block';
+        this.serverOutput.querySelector('pre')!.innerHTML = data.result;
+
         // .then(response => response.json())
         // .then(data => element.innerHTML = data.id );
+    }
+
+    closeServerOutput(){
+        this.deckOutput.style.display = 'block';
+        this.serverOutput.style.display = 'none';
     }
 
     private getRoutes():any[] {
@@ -338,6 +367,10 @@ paths:
                     <div class="deckViewerPane">
                         <code-editor id="deckOutput" class="${classMap({deckOutput:true, hidden:this.deckOutputHidden, setWidth:(this.visibleSection !== 'both')})}" language="yaml">
                         </code-editor>
+                        <div id="serverOutput">
+                            <span class="closeServer" @click=${this.closeServerOutput}>X</span>
+                            <pre></pre>
+                        </div>
                     </div>
                 </div>
 
