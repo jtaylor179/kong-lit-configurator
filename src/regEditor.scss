@@ -41,3 +41,8 @@ input:valid {
     }
   }
 }
+
+.mainForm::after {
+  content: " ";
+  padding:20px;
+}

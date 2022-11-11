@@ -274,7 +274,7 @@ export class RegForm extends LitElement {
                 return html`${fn.call(this, items, html)}`;
             } else {
                 return html`
-                    <form class="container">
+                    <form class="container mainForm">
                         ${this.renderSubItems(items)}
                     </form>
                 `;
