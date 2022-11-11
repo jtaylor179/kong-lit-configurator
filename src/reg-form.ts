@@ -52,9 +52,10 @@ export class RegForm extends LitElement {
     }
 
     renderCheckboxGroup(field:any, value:string[] = []):TemplateResult {
+        const initValue:string[]  = Array.isArray(value) ? value : [];
         return html`
             <div class="checkboxgroup">
-            ${field.options.map((o:string) => html`<md-checkbox type="checkbox" .checked=${value.indexOf(o) !== -1} @change=${(evt:any) => this._changeHandler(evt, field)} value=${o}></md-checkbox><label>${o}</label>`)}
+            ${field.options.map((o:string) => html`<md-checkbox type="checkbox" .checked=${initValue.indexOf(o) !== -1} @change=${(evt:any) => this._changeHandler(evt, field)} value=${o}></md-checkbox><label>${o}</label>`)}
             </div>
         `;
     }
@@ -71,7 +72,7 @@ export class RegForm extends LitElement {
     renderSwitch(field:any, value:string):TemplateResult {
         return html`
             <div class="textfield">
-            <md-switch @action=${(evt:any) => this._switchHandler(evt, field)} ?checked=${value}/>
+            <md-switch @action=${(evt:any) => this._switchHandler(evt, field)} ?selected=${value}/>
             </div>
         `;
     }
@@ -79,9 +80,11 @@ export class RegForm extends LitElement {
 
 
     private _handleFieldUpdate(field:any,  value:any,  action = 'set'){
+        debugger;
         const prop = field.property;
-
         const isPlugin: boolean = !!field.plugin;
+        const useConfig: boolean = isPlugin && prop.indexOf('config') !== -1;
+
         const plugin = field.plugin;
         if(field.dataType === 'number'){
             value = Number(value);
@@ -94,7 +97,7 @@ export class RegForm extends LitElement {
                 pluginDef = {name: plugin, config: {}};
                 targetConfig.plugins.push(pluginDef);
             }
-            targetConfig  = pluginDef.config;
+            targetConfig  = useConfig ? pluginDef.config: pluginDef;
         }
 
         // Translate function returns key value pairs
@@ -103,22 +106,23 @@ export class RegForm extends LitElement {
             const updates  = fn.call(this, field, value) || {};
             Object.assign(targetConfig, updates);
         } else {
+            const propToSet = useConfig ? prop.split('.')[1] : prop;
             if (field.dataType === 'array') {
-                if(!Array.isArray(targetConfig[prop])){
-                    targetConfig[prop] = [];
+                if(!Array.isArray(targetConfig[propToSet])){
+                    targetConfig[propToSet] = [];
                 }
                 if (action === 'set') {
-                    targetConfig[prop].push(value);
+                    targetConfig[propToSet].push(value);
                 } else if (action === 'replace') {
-                    targetConfig[prop] = value;
+                    targetConfig[propToSet] = value;
                 } else { // remove
-                    const index = targetConfig[prop].indexOf(value);
+                    const index = targetConfig[propToSet].indexOf(value);
                     if (index >= 0) {
-                        targetConfig[prop].splice(index, 1);
+                        targetConfig[propToSet].splice(index, 1);
                     }
                 }
             } else {
-                targetConfig[prop] = value;
+                targetConfig[propToSet] = value;
             }
         }
         if(field.triggerRender) {
@@ -186,12 +190,16 @@ export class RegForm extends LitElement {
     }
 
     private getPropertyValue(dataContext:any, field:any, defaultValue:any){
+        const prop = field.property;
+        const isPlugin: boolean = !!field.plugin;
+        const useConfig: boolean = isPlugin && prop.indexOf('config') !== -1;
+        const getProp = useConfig ? prop.split('.')[1] : prop;
         let val:any;
-        if(typeof field.property === 'object'){
+        if(typeof prop === 'object'){
             const fn = new Function('field', field.property.in);
             val = fn.call(dataContext, field);
         } else {
-            val = field.plugin ?  dataContext.config[field.property] : dataContext[field.property];
+            val = useConfig ?  dataContext.config[getProp] : dataContext[getProp];
         }
         if(typeof(val) !== 'undefined'){
             return val;
@@ -327,16 +335,14 @@ export class RegForm extends LitElement {
         fieldIndex.set(field.name, fieldDef);
 
         // Set Field Value
-        if(field.plugin){
+        if(field.plugin ){
             const pluginData:any = dataContext.plugins.find((ref:any) => ref.name === field.plugin);
-            if(pluginData && pluginData.config){
+            if(pluginData){
                 fieldDef.value = this.getPropertyValue(pluginData, field, fieldValue);
             }
         } else {
             fieldDef.value = this.getPropertyValue(dataContext, field, fieldValue);
         }
-
-
 
         // Set Required property -
         if(typeof(field.required) === 'boolean'){

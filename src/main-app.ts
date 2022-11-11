@@ -56,6 +56,9 @@ export class MainApp extends LitElement {
         background-color: transparent;
         color:blue;
       }
+      .saveDeckBtn {
+        margin-left:30px;
+      }
       .main-layout {
         display: flex;
         flex:1;
@@ -325,13 +328,13 @@ paths:
                     </div>
                         <div class="mainBody">
                             <div class="tab-row"><button-tabs style="width:800px" contextType=${this.contextType}  @change=${this.navigateSection} currentTab=${this.currentRegistrationSection} .tabList=${this.registrationConfig.sections}></button-tabs>
-                                <button @click=${this.syncToKong} class="linkButton">Sync</button>
-                                <button @click=${this.showImport} class="linkButton">Import OpenAPI</button>
+                                
+                               
                             </div>
                             <reg-form id="regForm" routeName=${this.currentRouteName}  contextType=${this.contextType} section=${this.currentRegistrationSection} @change="${this._handleFormInput}"></reg-form>
                         </div>
                     </div>
-                    <label class="deckPreviewLabel">Deck Output</label>
+                    <div class="deckPreviewLabel"><label>Deck Output</label><button @click=${this.syncToKong} class="saveDeckBtn linkButton">Save</button> <button @click=${this.showImport} class="linkButton">Import OpenAPI Spec</button></div>
                     <div class="deckViewerPane">
                         <code-editor id="deckOutput" class="${classMap({deckOutput:true, hidden:this.deckOutputHidden, setWidth:(this.visibleSection !== 'both')})}" language="yaml">
                         </code-editor>
@@ -380,6 +383,11 @@ paths:
                 currentService.plugins.push(updatePlugin);
             } else {
                 const config: any = svcPlugin.config;
+                for (const prop in updatePlugin) {
+                    if(prop !== 'plugins') {
+                        svcPlugin[prop] = updatePlugin[prop];
+                    }
+                }
                 for (const prop in updatePlugin.config) {
                     config[prop] = updatePlugin.config[prop];
                 }

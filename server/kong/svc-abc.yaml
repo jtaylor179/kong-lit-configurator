@@ -20,6 +20,7 @@ services:
       - GET
       - PUT
       - PATCH
+      - DELETE
       origins: null
       preflight_continue: false
     enabled: true

@@ -142,10 +142,12 @@ export class CodeEditor extends LitElement {
       automaticLayout: true,
       readOnly: this.readOnly ?? false,
       minimap: { enabled: false },
+      folding: true
     });
     this.editor.getModel()!.onDidChangeContent(() => {
       this.dispatchEvent(new CustomEvent("change", {bubbles: true, composed:true, detail: { value: this.getValue()} }));
     });
+
     window
       .matchMedia("(prefers-color-scheme: dark)")
       .addEventListener("change", () => {

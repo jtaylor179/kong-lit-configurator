@@ -105,7 +105,7 @@ registrationConfig:
       name: cors-methods
       plugin: cors
       dataType: array
-      property: methods
+      property: config.methods
       type: checkbox
       label: CORS Methods
       options:
@@ -121,14 +121,14 @@ registrationConfig:
       name: cors-max-age
       label: CORS Max Age
       plugin: cors
-      property: max_age
+      property: config.max_age
       type: textfield
       dataType: number
     corsOriginsField:
       itemType: field
       name: cors-origins
       plugin: cors
-      property: origin
+      property: config.origin
       label: Origins
       type: textfield
       dataType: array
