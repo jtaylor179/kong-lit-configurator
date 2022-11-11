@@ -77,10 +77,7 @@ export class RegForm extends LitElement {
         `;
     }
 
-
-
     private _handleFieldUpdate(field:any,  value:any,  action = 'set'){
-        debugger;
         const prop = field.property;
         const isPlugin: boolean = !!field.plugin;
         const useConfig: boolean = isPlugin && prop.indexOf('config') !== -1;
@@ -201,7 +198,7 @@ export class RegForm extends LitElement {
         } else {
             val = useConfig ?  dataContext.config[getProp] : dataContext[getProp];
         }
-        if(typeof(val) !== 'undefined'){
+        if(!(val === undefined || val === null)){
             return val;
         } else if(typeof(field.default) !== 'undefined'){
             return field.default;

@@ -65,6 +65,13 @@ registrationConfig:
         dataType: array
         property: paths
       - itemRef: methodsField
+      - itemRef: corsEnabledField
+      - itemType: container
+        display: 'return fieldIndex.get("cors-enabled") ?
+                    fieldIndex.get("cors-enabled").value === true : false;'
+        items:
+          - itemRef: corsMethodsField
+          - itemRef: corsMaxAge
   - name: Authentication
     label: Authentication
     items:
@@ -124,6 +131,7 @@ registrationConfig:
       property: config.max_age
       type: textfield
       dataType: number
+      default: 1000
     corsOriginsField:
       itemType: field
       name: cors-origins

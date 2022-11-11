@@ -41,6 +41,7 @@ services:
     methods:
     - PUT
     - DELETE
+    - POST
     name: myfirstroute
     path_handling: v0
     paths:
@@ -53,6 +54,7 @@ services:
         max_age: null
         methods:
         - DELETE
+        - PUT
         origins: null
         preflight_continue: false
       enabled: true
