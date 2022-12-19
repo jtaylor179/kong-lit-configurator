@@ -6,11 +6,10 @@ registrationConfig:
     restrictTo: service
     items:
     - itemType: container
+      # Demo of custom container
       containerRenderer: >
         return html`<div>
-                <label style="display:block">---</label>
-                ${this.renderSubItems(items)}
-                <div>---</div>
+                ${renderSubItems(items)}
                 </div>`;
       style: 'border: 1px solid red;'
       class: defaultContainer
@@ -27,7 +26,6 @@ registrationConfig:
         name: upstreamUrl
         type: textfield
         label: Upstream URL
-        default:
         dataType: string
         property:
           out: 'const urlSpec = new URL(value); return {"host": urlSpec.hostname, "protocol":
@@ -56,12 +54,10 @@ registrationConfig:
     label: Route Settings
     restrictTo: route
     items:
-      - itemRef: demoContainer
       - itemType: field
         name: path
         type: textfield
         label: Path
-        default:
         dataType: array
         property: paths
       - itemRef: methodsField
@@ -72,6 +68,7 @@ registrationConfig:
         items:
           - itemRef: corsMethodsField
           - itemRef: corsMaxAge
+      - itemRef: demoContainer
   - name: Authentication
     label: Authentication
     items:
@@ -120,8 +117,7 @@ registrationConfig:
       - POST
       - PUT
       - DELETE
-      default:
-      required: 'return fieldIndex.get("cors-enabled") ? fieldIndex.get("cors-enabled").value === true : false;'
+      requiredIf: 'return fieldIndex.get("cors-enabled") ? fieldIndex.get("cors-enabled").value === true : false;'
       help: Blah blah
     corsMaxAge:
       itemType: field
@@ -140,7 +136,6 @@ registrationConfig:
       label: Origins
       type: textfield
       dataType: array
-      default:
     methodsField:
       itemType: field
       name: methods
@@ -173,3 +168,4 @@ registrationConfig:
 #           messages: [
 #                        {name: 'stateCheckmessage', fnCheckMessage: this.checkForStateMessage}
 #                    ]
+#

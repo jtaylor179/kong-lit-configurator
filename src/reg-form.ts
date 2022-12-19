@@ -267,8 +267,8 @@ export class RegForm extends LitElement {
         }
         if(display) {
             if (!!refContainer.containerRenderer) {
-                const fn = new Function('items', 'html', refContainer.containerRenderer);
-                return html`${fn.call(this, items, html)}`;
+                const fn = new Function('items', 'html', 'renderSubItems', refContainer.containerRenderer);
+                return html`${fn.call(this, items, html, this.renderSubItems.bind(this))}`;
             } else {
                 return html`
                     <form class="container mainForm">
