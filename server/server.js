@@ -104,8 +104,8 @@ app.get('/api/formDefinition', function(req, res){
     res.sendFile(path.resolve('../src/formDefinition.yaml'));
 });
 
-app.get('/api/formDefinition2', function(req, res){
-    res.sendFile(path.resolve('../src/formDefinition.yaml'));
+app.get('/api/formDefinitionEsModule', function(req, res){
+    res.sendFile(path.resolve('./yamlToEs6/exampleoutput.js'));
 });
 
 app.get('/api/loadRegistration/:svcname', function(req, res) {

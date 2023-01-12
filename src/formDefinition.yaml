@@ -22,6 +22,7 @@ registrationConfig:
         dataType: array
         property: tags
         pattern: '[Tt]ag\d+$'
+        errorText: Demo validation - prefix with 'Tag'
       - itemType: field
         name: upstreamUrl
         type: textfield
@@ -39,10 +40,8 @@ registrationConfig:
               return '';
             }
         validators:
-        - name: 'isUrl'
-          message: 'invalid url'
-        - name: 'validateUpstreamUrl'
-          async: true
+        - key: 'isUrl'
+          errorText: 'invalid url'
     - itemRef: corsEnabledField
     - itemType: container
       display: 'return fieldIndex.get("cors-enabled") ?
@@ -104,6 +103,11 @@ registrationConfig:
       label: Name
       dataType: string
       required: true
+      validators:
+      - key: 'validServiceName'
+        errorText: 'invalid service name'
+      - key: 'isNameUnique'
+        errorText: 'service name is not unique'
     corsMethodsField:
       itemType: field
       name: cors-methods
@@ -151,21 +155,3 @@ registrationConfig:
       - POST
       - PUT
       - DELETE
-
-#  TODO: Implememt Validation Framework
-#  validators: [
-#            {
-#                name: 'customAsyncValidator',
-#                fnValidate: this.customAsyncValidation,
-#                async: true
-#            }
-#           {name: 'checkboxIsChecked'}
-#      {name: 'notEmpty', message: 'Password is required'}
-#                     {   name: 'customValidator',
-#                        fnValidate: this.customValidation
-#                    }
-#        ]
-#           messages: [
-#                        {name: 'stateCheckmessage', fnCheckMessage: this.checkForStateMessage}
-#                    ]
-#

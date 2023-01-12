@@ -8,7 +8,7 @@ export class Config {
                 "restrictTo": "service",
                 "items": [{
                     "itemType": "container",
-                    "containerRenderer": function (renderSubItems, items) {
+                    "containerRenderer": (items, html, renderSubItems) => {
                         return html`
                             <div> ${renderSubItems(items)}</div>`;
                     },
@@ -38,7 +38,7 @@ export class Config {
                         }]
                     }]
                 }, {"itemRef": "corsEnabledField"}, {
-                    "itemType": "container", "display": function (value, fieldIndex) {
+                    "itemType": "container", "display": (value, fieldIndex) => {
                         return fieldIndex.get("cors-enabled") ? fieldIndex.get("cors-enabled").value === true : false;
                     }, "items": [{"itemRef": "corsMethodsField"}, {"itemRef": "corsMaxAge"}]
                 }]
@@ -55,7 +55,7 @@ export class Config {
                     "property": "paths"
                 }, {"itemRef": "methodsField"}, {"itemRef": "corsEnabledField"}, {
                     "itemType": "container",
-                    "display": function (value, fieldIndex) {
+                    "display": (value, fieldIndex) => {
                         return fieldIndex.get("cors-enabled") ? fieldIndex.get("cors-enabled").value === true : false;
                     },
                     "items": [{"itemRef": "corsMethodsField"}, {"itemRef": "corsMaxAge"}]
@@ -73,7 +73,7 @@ export class Config {
             demoContainer: {
                 "itemType": "container",
                 "items": [],
-                "containerRenderer": function (renderSubItems, items) {
+                "containerRenderer": (items, html, renderSubItems) => {
                     return html`
                         <div>ref container example</div>`;
                 }
@@ -107,7 +107,7 @@ export class Config {
                 "type": "checkbox",
                 "label": "CORS Methods",
                 "options": ["GET", "POST", "PUT", "DELETE"],
-                "requiredIf": function (value, fieldIndex) {
+                "requiredIf": (value, fieldIndex) => {
                     return fieldIndex.get("cors-enabled") ? fieldIndex.get("cors-enabled").value === true : false;
                 },
                 "help": "Blah blah"
@@ -144,5 +144,3 @@ export class Config {
         }
     }
 }
-
-console.log(Config.registrationConfig.sections.length);

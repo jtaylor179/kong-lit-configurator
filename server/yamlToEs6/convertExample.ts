@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import {oneLine} from 'common-tags';
 
 // Load the input YAML file
-const input: any = yaml.load(fs.readFileSync('../src/formDefinition.yaml', 'utf8'));
+const input: any = yaml.load(fs.readFileSync('../../src/formDefinition.yaml', 'utf8'));
 
 function genSections(sections: any[]) {
     return `
@@ -24,16 +24,16 @@ function renderProperties(obj: any): string {
             ).join(',')}]`;
         }
         if (key === 'containerRenderer') {
-            return oneLine`"${key}": function(items, html, renderSubItems){ ${value} }`;
+            return oneLine`"${key}": (items, html, renderSubItems) => { ${value} }`;
         } else if (key === 'required') {
             const val = obj[key];
             if (val === true || val === false) {
                 return oneLine`"${key}":${val}`;
             } else {
-                return oneLine`"${key}": function(fieldIndex){ ${value} }`;
+                return oneLine`"${key}": (fieldIndex) => { ${value} }`;
             }
         } else if ( key === 'display' || key === 'requiredIf'){
-            return oneLine`"${key}": function(value, fieldIndex){ ${value} }`;
+            return oneLine`"${key}": (value, fieldIndex) => { ${value} }`;
         }
 
         else {
@@ -63,7 +63,7 @@ function generateConfig(config: {
     sections: any;
 }) {
     return `
-export class Config {
+export abstract class Config {
     static registrationConfig = {
             sections: [
                 ${genSections(config.sections || [])}

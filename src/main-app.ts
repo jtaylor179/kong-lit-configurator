@@ -461,6 +461,11 @@ paths:
         const ref: any = yaml.load(definition);
         this.registrationConfig = ref.registrationConfig || [];
         this.updateRegForm();
+
+        // TODO - use server rendered template to avoid CSP restrictions
+        // @ts-ignore
+        const { Config } = await import('http://localhost:3000/api/formDefinitionEsModule');
+        console.log(Config.registrationConfig);
     }
 
 

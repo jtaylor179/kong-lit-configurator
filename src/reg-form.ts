@@ -5,14 +5,8 @@ import styles  from './regEditor.scss';
 
 import {observer} from "./@material/web/compat/base/observer";
 import {ifDefined} from "lit/directives/if-defined.js";
-
-interface FieldSettings {
-    value: any;
-    required: boolean;
-    display: boolean;
-    priority: number;
-    field: any;
-}
+import {FieldSettings} from "./types";
+import {builtInValidators, isPromise} from "./standardValidations";
 
 
 // @ts-ignore
@@ -60,14 +54,16 @@ export class RegForm extends LitElement {
         `;
     }
 
+
     renderTextField(field:any, value:string):TemplateResult {
         const type = field.dataType === 'number'?  'number':'text';
         return html`
             <div class="textfield">
-            <md-outlined-text-field pattern=${ifDefined(field.pattern)} ?required=${!!field.required} @input=${(evt:any) => this._handleTextInput(evt, field)} type=${type} .value=${value}/>
+            <md-outlined-text-field pattern=${ifDefined(field.pattern)} errorText=${ifDefined(field.errorText)}  ?required=${!!field.required} @input=${(evt:any) => this._handleTextInput(evt, field)} type=${type} .value=${value}/>
             </div>
         `;
     }
+
 
     renderSwitch(field:any, value:string):TemplateResult {
         return html`
@@ -149,6 +145,7 @@ export class RegForm extends LitElement {
 
     private async _handleTextInput(e: Event, field:any) {
         const ref: any = e.currentTarget;
+
         console.log(ref.outerHTML);
         console.log(field.name);
         let actionType = 'set';
@@ -157,15 +154,45 @@ export class RegForm extends LitElement {
             actionType = 'replace';
             value = ref.value.split(',');
         }
+        // reset custom validity
+        ref.setCustomValidity('');
+
         const isValid = ref.checkValidity();
         if(isValid) {
-            this._handleFieldUpdate(field, value, actionType);
+            if(Array.isArray(field.validators) && field.validators.length > 0){
+                let { isValid, errorText } = await this.processFieldValidators(field, value);
+                if(!isValid){
+                    ref.setCustomValidity(errorText);
+                } else {
+                    this._handleFieldUpdate(field, value, actionType);
+                }
+            } else {
+                this._handleFieldUpdate(field, value, actionType);
+            }
             await this.updateComplete;
-            // const len = ref.value.length;
-            // setTimeout( function(){ console.log('focus'); ref.focus(); ref.click(); ref.setSelectionRange(len, len); }, 5000);
+        } else if(ref.errorText){
+            ref.setCustomValidity(ref.errorText);
         }
         ref.reportValidity();
+    }
 
+    // Loop through all validators - end on first error
+    async processFieldValidators(field:any, value:any):Promise<{ isValid: boolean, errorText: string}>{
+        for (let x = 0; x < field.validators.length; x++) {
+            const def = field.validators[x];
+            const validator = builtInValidators[def.key];
+            if (!validator) {
+                alert('invalid validation specified');
+            }
+            let validationResult: boolean | Promise<boolean> = validator.call(this, value);
+            if (isPromise(validationResult)) {
+                validationResult = await validationResult;
+            }
+            if (!validationResult) {
+                return Promise.resolve({isValid: false, errorText: def.errorText});
+            }
+        }
+        return Promise.resolve({isValid:true, errorText: ''});
     }
 
     private getDataRoot(){
