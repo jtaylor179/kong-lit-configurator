@@ -14,7 +14,6 @@ import {builtInValidators, isPromise} from "./standardValidations";
 export class RegForm extends LitElement {
     // @ts-ignore
     static styles: CSSResultGroup | undefined = styles;
-    // static styles = css``;
 
     @property({type:Object})
     registrationConfig:any = {};
@@ -29,16 +28,18 @@ export class RegForm extends LitElement {
     })
     routeName?: string;
 
+    // Used for determining which top level section to render
     @property()
     section: string = 'GeneralService';
 
+    // store reference to configuration object based on current section
+    private _currentSection: any;
 
     @property( { type: Object})
     savedSettings: any = { services : [{ plugins: [], routes: []}]};
 
-    private fieldRuntimeProps : Map<number, FieldSettings> = new Map<number, FieldSettings>();
-
-    private _currentSection: any;
+    // used to store an index of fields in the current section and runtime values
+    private fieldRuntimeProps : Map<string, FieldSettings> = new Map<string, FieldSettings>();
 
 
     renderLabel(field:any):TemplateResult{
@@ -82,40 +83,40 @@ export class RegForm extends LitElement {
         if(field.dataType === 'number'){
             value = Number(value);
         }
-        let targetConfig:any = this.getDataRoot();
+        let updateTarget:any = this.getDataRoot();
 
         if(isPlugin) {
-            let pluginDef: any = targetConfig.plugins.find((ref: any) => ref.name === plugin);
+            let pluginDef: any = updateTarget.plugins.find((ref: any) => ref.name === plugin);
             if (!pluginDef) {
                 pluginDef = {name: plugin, config: {}};
-                targetConfig.plugins.push(pluginDef);
+                updateTarget.plugins.push(pluginDef);
             }
-            targetConfig  = useConfig ? pluginDef.config: pluginDef;
+            updateTarget  = useConfig ? pluginDef.config: pluginDef;
         }
 
         // Translate function returns key value pairs
         if(typeof(prop) === 'object'){
             const fn = new Function('field', 'value', prop.out);
             const updates  = fn.call(this, field, value) || {};
-            Object.assign(targetConfig, updates);
+            Object.assign(updateTarget, updates);
         } else {
             const propToSet = useConfig ? prop.split('.')[1] : prop;
             if (field.dataType === 'array') {
-                if(!Array.isArray(targetConfig[propToSet])){
-                    targetConfig[propToSet] = [];
+                if(!Array.isArray(updateTarget[propToSet])){
+                    updateTarget[propToSet] = [];
                 }
                 if (action === 'set') {
-                    targetConfig[propToSet].push(value);
+                    updateTarget[propToSet].push(value);
                 } else if (action === 'replace') {
-                    targetConfig[propToSet] = value;
+                    updateTarget[propToSet] = value;
                 } else { // remove
-                    const index = targetConfig[propToSet].indexOf(value);
+                    const index = updateTarget[propToSet].indexOf(value);
                     if (index >= 0) {
-                        targetConfig[propToSet].splice(index, 1);
+                        updateTarget[propToSet].splice(index, 1);
                     }
                 }
             } else {
-                targetConfig[propToSet] = value;
+                updateTarget[propToSet] = value;
             }
         }
         if(field.triggerRender) {
@@ -210,7 +211,6 @@ export class RegForm extends LitElement {
             rootRoute.plugins = rootRoute.plugins ?? []
             return rootRoute;
         }
-
     }
 
     private getPropertyValue(dataContext:any, field:any, defaultValue:any){
@@ -236,16 +236,11 @@ export class RegForm extends LitElement {
 
     renderField(field:any):TemplateResult {
         let fieldDef: TemplateResult = html``;
-        // get field value;
-        // const defaults:any = {'array':[], 'string':'', 'number':0};
-        // const dataContext:any = this.getDataRoot();
-
         const fieldProps = this.fieldRuntimeProps.get(field.name)!;
         const fieldValue: any = fieldProps.value;
         if(!fieldProps.display){
             return html``;
         }
-
 
         switch(field.type){
             case 'checkbox':
@@ -308,15 +303,7 @@ export class RegForm extends LitElement {
         }
     }
 
-    /*
-        need to get
-        later may
-     */
-
-
     private initializeSectionValues(rootContainer: any){
-        // this.fieldRuntimeProps = new Map<number, FieldSettings>();
-        // create
         let arrFields: FieldSettings[] = this.getFieldList(rootContainer);
         // need to sort in case of dependent fields
         arrFields = arrFields.sort((a, b) => (a.priority > b.priority) ? 1 : -1);
@@ -353,8 +340,6 @@ export class RegForm extends LitElement {
         const fieldIndex = this.fieldRuntimeProps;
         let fieldValue:any =  defaults[field.dataType];
 
-        // TODO - cache dynamic functions in fieldIndex  requireFunction, displayFunction, valueFunction
-        // TODO - this should only be done on first load
         // Add field to global index
         fieldIndex.set(field.name, fieldDef);
 
@@ -405,16 +390,6 @@ export class RegForm extends LitElement {
     }
 }
 
-// ${this.definition?.fields?.map((ref:any) =>
-//     html`<li>${ref.label}</li>`
-// )}
-// <md-badge value="hello"></md-badge>
-// <md-tonal-button label="Hello"></md-tonal-button>
-// <label>Hi</label>
-// <md-outlined-text-field id=""></md-outlined-text-field>
-//
-// <label>CORS Support</label>
-// <md-switch id="second"></md-switch>
 
 declare global {
     interface HTMLElementTagNameMap {

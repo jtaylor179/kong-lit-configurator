@@ -262,9 +262,6 @@ export class MainApp extends LitElement {
         this.deckOutput.style.display = 'none';
         this.serverOutput.style.display = 'block';
         this.serverOutput.querySelector('pre')!.innerHTML = data.result;
-
-        // .then(response => response.json())
-        // .then(data => element.innerHTML = data.id );
     }
 
     closeServerOutput() {
@@ -328,10 +325,6 @@ export class MainApp extends LitElement {
 
     @state()
     isImportModalVisible: boolean = false;
-
-    // @query('#regForm')
-    // regForm: RegForm;
-
 
     private navigateSection(evt: any) {
         this.currentRegistrationSection = evt.detail.value;
@@ -513,18 +506,10 @@ paths:
     }
 
     _handleConfigChange(e: any) {
-        // this.updateRegForm(e.detail.value);
         const reg = e.detail.value;
         this.registrationConfig = !!reg.registrationConfig && !!reg.registrationConfig.sections ? reg.registrationConfig : {sections: []};
         this.updateRegForm();
     }
-
-    // updateConfigForm(sUpdate:string){
-    //     const configForm:ConfigForm = this.renderRoot.querySelector('config-form') as ConfigForm;
-    //     if(configForm) {
-    //         configForm.updateTemplate(sUpdate);
-    //     }
-    // }
 
     updateRegForm() {
         const regForm: RegForm = this.renderRoot.querySelector('reg-form') as RegForm;
